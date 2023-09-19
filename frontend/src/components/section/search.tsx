@@ -31,8 +31,8 @@ const Search = () => {
     <Card className="p-3">
       <div className="flex justify-between">
         <div className="flex gap-2">
-          {categories.map((category) => (
-            <Button key={category.value} variant="outline" className="rounded-full border-dashed">{category.label}</Button>
+          {categories.map((category, index) => (
+            <Button key={index} variant="outline" className="rounded-full border-dashed">{category.label}</Button>
           ))}
         </div>
         <Input className="w-60" type="text" name="search" id="search" placeholder="Search..." />

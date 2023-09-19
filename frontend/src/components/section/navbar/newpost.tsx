@@ -8,9 +8,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Globe, Image, ChevronsUpDown, Check } from "lucide-react"
+import { Globe, Image as Img, ChevronsUpDown, Check, Lock, PenSquare } from "lucide-react"
 
-const categories = [
+interface Categories { value: string; label: string }
+
+const categories: Array<Categories> = [
   {
     value: "sport",
     label: "Sport",
@@ -36,11 +38,16 @@ const categories = [
 const NewPost = () => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("")
+  const [publish, setPublish] = useState(<Globe />)
+
+  function handlePublish() {
+    setPublish(<Lock />)
+  }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="font-bold">New Post</Button>
+        <Button className="font-bold"><PenSquare className="mr-2" /><span>New Post</span></Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
@@ -62,9 +69,9 @@ const NewPost = () => {
         <DialogFooter className="flex-col sm:justify-between">
           <div className="flex justify-start gap-2">
             <TooltipProvider>
-              <Tooltip>
+              <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon"><Image /></Button>
+                  <Button variant="outline" size="icon"><Img /></Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Add an image</p>
@@ -72,12 +79,12 @@ const NewPost = () => {
               </Tooltip>
             </TooltipProvider>
             <TooltipProvider>
-              <Tooltip>
+              <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon"><Globe /></Button>
+                  <Button variant="outline" size="icon" onClick={handlePublish}>{publish}</Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Who can see your post?</p>
+                  <p>Everybody can see your post</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -102,6 +109,7 @@ const NewPost = () => {
                   <CommandGroup>
                     {categories.map((category) => (
                       <CommandItem
+                        className="cursor-pointer"
                         key={category.value}
                         onSelect={(currentValue) => {
                           setValue(currentValue === value ? "" : currentValue)

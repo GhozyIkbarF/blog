@@ -8,12 +8,10 @@ export default function Home() {
     <>
       <Title title="Home / The Social" />
 
-      <main className="min-h-screen">
-        <div className="w-4/6 py-5 mx-auto flex flex-col gap-2">
-          <Navbar />
-          <Search />
-          <Post />
-        </div>
+      <main className="min-h-screen w-4/6 py-5 mx-auto flex flex-col gap-2">
+        <Navbar />
+        <Search />
+        <Post />
       </main>
     </>
   )
