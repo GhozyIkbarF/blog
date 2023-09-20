@@ -17,7 +17,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CREATE_USER } from "@/validation";
 import { useRouter } from "next/router";
-import { useToast } from "@/components/ui/use-toast"
+import axios from 'axios'
 
 interface Inputs {
   name: string;
@@ -50,16 +50,17 @@ const SignUp = () => {
       confirmPassword: "",
     },
   });
-  const { toast } = useToast();
+
+  const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+  const headers = {
+    'Content-Type': 'application/json'
+  }
+  
   const onSubmit = async (data: Inputs) => {
     try {
-      console.log(data);
-      toast({
-        variant: "default",
-        description: "Login success",
-        duration: 2500,
-      })
+      const res = await axios.post(`${baseURL}/register`, data, {headers});
       reset();
+      console.log(res);
       clearErrors(["name", "username", "email", "password", "confirmPassword"]);
       router.push('/login')
     } catch (err) {

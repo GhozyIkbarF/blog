@@ -34,7 +34,8 @@ export const getPosts = async (req, res) => {
             include: {
                     author: {
                         select: {
-                            username: true
+                            username: true,
+                            email: true
                         }
                 }
             }
@@ -44,7 +45,7 @@ export const getPosts = async (req, res) => {
                 post.image = `${baseUrl}/${post.image}`
             })
         }
-        res.status(200).json(posts)
+        res.status(200).json({posts: posts})
     }catch(err){
         res.status(500).json({message: err.message });
     }
