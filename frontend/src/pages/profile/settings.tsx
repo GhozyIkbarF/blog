@@ -3,11 +3,12 @@ import Link from 'next/link'
 import Navbar from '@/components/section/navbar/navbar'
 import Title from '@/components/head'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card } from "@/components/ui/card"
 import { Undo2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Profile from '@/components/section/settings/profile'
+import Password from '@/components/section/settings/password'
 
 const Settings = () => {
   return (
@@ -34,47 +35,30 @@ const Settings = () => {
                 </TooltipProvider>
                 <h3 className="ml-3">Settings</h3>
               </div>
-              <div className="flex flex-row w-full">
-                <aside>
-                  <ul className="list-none">
-                    <li>
-                      <Link href="">
-                        <Button className="w-full justify-start" variant="outline">Account</Button>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="">
-                        <Button className="w-full justify-start" variant="outline">Preferences</Button>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="">
-                        <Button className="w-full justify-start" variant="outline">Notifications</Button>
-                      </Link>
-                    </li>
-                  </ul>
-                </aside>
-                <section>
-                  <CardHeader className="flex flex-row space-y-0 pb-6">
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src="https://github.com/yandaagil.png" />
-                      <AvatarFallback>YA</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <CardTitle className="ml-3 text-lg">Yanda Agil</CardTitle>
-                      <CardDescription className="ml-3 [&:not(:first-child)]:mt-0">@yandaagil</CardDescription>
-                    </div>
-                  </CardHeader>
-                  <article className="flex flex-col">
-                    <CardContent>
-                      <Badge className="mb-3">Fashion</Badge>
-                      <CardTitle className="mb-3">Lorem, ipsum dolor.</CardTitle>
-                      <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime placeat nisi, excepturi doloribus exercitationem suscipit unde aut minus similique architecto animi reiciendis repellat voluptatem est, amet quae expedita tempora soluta cum vitae delectus? Odit officia architecto optio id ipsum aliquid recusandae repudiandae. Cumque, cum! Vel excepturi placeat incidunt odit. Non ipsa repellat culpa inventore possimus reiciendis porro architecto, commodi optio, ducimus quasi est veritatis perferendis libero provident nulla reprehenderit consequatur at saepe sapiente dolorum! Quas ducimus sed esse unde, cum facere. Laudantium tempora cupiditate explicabo laboriosam in iure, autem, minima et illo sint expedita neque assumenda harum. Similique, hic delectus.</p>
-                    </CardContent>
-                  </article>
-                  <CardDescription className="m-0 px-6 pb-6 [&:not(:first-child)]:mt-0">6:49 PM · Sep 19, 2023</CardDescription>
-                </section>
-              </div>
+              <Tabs defaultValue="profile">
+                <div className="flex flex-row w-full justify-between">
+                  <aside className="w-[25%]">
+                    <TabsList>
+                      <ul className="list-none">
+                        <li>
+                          <TabsTrigger value="profile" className="w-full">
+                            <Button className="w-full justify-start" variant="outline">Profile</Button>
+                          </TabsTrigger>
+                        </li>
+                        <li>
+                          <TabsTrigger value="password" className="w-full">
+                            <Button className="w-full justify-start" variant="outline">Password</Button>
+                          </TabsTrigger>
+                        </li>
+                      </ul>
+                    </TabsList>
+                  </aside>
+                  <section className="w-[75%] py-6 px-6">
+                    <Profile />
+                    <Password />
+                  </section>
+                </div>
+              </Tabs>
             </section>
           </Card>
         </section>
