@@ -29,6 +29,7 @@ interface Post {
   published: boolean;
   title: string;
   updatedAt: string;
+
 }
 
 interface Repo {
@@ -40,7 +41,6 @@ const Post = () => {
 
   const [data, setData] = useState<Repo | null>(null);
   const [isLoading, setLoading] = useState<Boolean>(true);
-  console.log(data);
 
   useEffect(() => {
     fetch(`${baseURL}/post`)
@@ -56,8 +56,8 @@ const Post = () => {
 
   return (
     <Card>
-      {data.posts.map((post) => (
-        <>
+      {data.posts.map((post, index ) => (
+        <React.Fragment key={index}>
           <div className="flex flex-row">
             <div className="flex flex-col">
               <Avatar className="ml-6 mt-6">
@@ -95,8 +95,8 @@ const Post = () => {
               </CardContent>
             </div>
           </div>
-          <Separator />
-        </>
+          {index !== data?.posts.length -1 && <Separator />}
+        </React.Fragment>
       ))}
     </Card>
   );

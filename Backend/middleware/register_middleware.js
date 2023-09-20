@@ -3,13 +3,20 @@ import { prismaClient } from '../src/prisma-client.js';
 
 export const createUserMiddleware = async (req, res, next) => {
     const userSchema = Joi.object({
-        username: Joi.string().required().messages({
+        name: Joi.string().required().messages({
             'string.empty': 'Name cannot be empty',
             'any.required': 'Name is required',
+        }),
+        username: Joi.string().required().messages({
+            'string.empty': 'Username cannot be empty',
+            'any.required': 'Username is required',
         }),
         email: Joi.string().email().required().messages({
             'string.email': 'Invalid email format',
             'any.required': 'Email is required',
+        }),
+        photo_profile: Joi.string().nullable().messages({
+            'string.empty': 'Photo profile cannot be empty',
         }),
         password: Joi.string().min(6).required().messages({
             'string.min': 'Password must be at least 6 characters long',
