@@ -11,10 +11,10 @@ export default function Home() {
       <Title title="Home / The Social" />
 
       <main className="min-h-screen w-4/6 py-5 mx-auto flex flex-col gap-2">
-        <Toaster />
         <Navbar />
         <Search />
         <Post />
+        <Toaster />
       </main>
     </>
   )
