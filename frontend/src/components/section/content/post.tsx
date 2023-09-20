@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Eye } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 
 interface Posts {
   avatar: string
@@ -15,6 +16,7 @@ interface Posts {
   username: string
   time: string
   title: string
+  category?: string
   content: string
 }
 
@@ -27,6 +29,7 @@ const posts: Array<Posts> = [
     username: "@yandaagil",
     time: "3 hours",
     title: "Lorem, ipsum dolor.",
+    category: "Fashion",
     content: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime placeat nisi, excepturi doloribus exercitationem suscipit unde aut minus similique architecto animi reiciendis repellat voluptatem est, amet quae expedita tempora soluta cum vitae delectus? Odit officia architecto optio id ipsum aliquid recusandae repudiandae. Cumque, cum! Vel excepturi placeat incidunt odit. Non ipsa repellat culpa inventore possimus reiciendis porro architecto, commodi optio, ducimus quasi est veritatis perferendis libero provident nulla reprehenderit consequatur at saepe sapiente dolorum! Quas ducimus sed esse unde, cum facere. Laudantium tempora cupiditate explicabo laboriosam in iure, autem, minima et illo sint expedita neque assumenda harum. Similique, hic delectus."
   },
   {
@@ -37,6 +40,7 @@ const posts: Array<Posts> = [
     username: "@ghozyikbar",
     time: "5 hours",
     title: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    category: "Technology",
     content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut cupiditate vero tempore, recusandae assumenda facilis, quos sed ipsam laudantium iusto laborum non aliquid aliquam dolorum eaque, impedit neque veritatis harum hic. Repudiandae sit illum velit! Numquam, debitis reprehenderit! Animi harum quam quibusdam omnis, repudiandae voluptates eaque, illum magni dolore quidem molestiae mollitia hic qui temporibus. Error, enim? Libero, rem amet! Perferendis nesciunt blanditiis recusandae expedita repudiandae? Modi unde quibusdam odit voluptas suscipit labore veniam facilis repellendus natus libero dolorem fugit, dolorum temporibus ratione maiores exercitationem quos, dignissimos vel aspernatur saepe doloribus! Laboriosam, incidunt nesciunt consequatur labore laborum quos explicabo iusto!."
   },
   {
@@ -82,6 +86,7 @@ const Post = () => {
               </CardHeader>
               <CardContent>
                 <CardTitle>{post.title}</CardTitle>
+                {post.category ? <Badge className="mt-3">{post.category}</Badge> : null}
                 <p className="line-clamp-3">{post.content}</p>
               </CardContent>
             </article>

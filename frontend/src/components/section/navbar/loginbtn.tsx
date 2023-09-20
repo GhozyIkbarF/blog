@@ -1,11 +1,16 @@
 import React from 'react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 const LoginBtn = () => {
   return (
     <>
-      <Button>Login</Button>
-      <Button variant="ghost">Sign Up</Button>
+      <Link href="/login">
+        <Button>Login</Button>
+      </Link>
+      <Link href="/signup">
+        <Button variant="ghost">Sign Up</Button>
+      </Link>
     </>
   )
 }
