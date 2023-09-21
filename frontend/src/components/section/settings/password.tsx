@@ -1,5 +1,4 @@
 import React from 'react'
-import { TabsContent } from "@/components/ui/tabs"
 import { Separator } from '@/components/ui/separator'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button"
 
 const Password = () => {
   return (
-    <TabsContent value="password">
+    <>
       <h4>Password</h4>
       <small className="muted-text">This is how others will see you on the site.</small>
       <Separator className="my-6" />
@@ -33,7 +32,7 @@ const Password = () => {
           Update Password
         </Button>
       </form>
-    </TabsContent>
+    </>
   )
 }
 
