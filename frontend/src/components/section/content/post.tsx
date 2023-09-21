@@ -1,5 +1,5 @@
 import React from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -55,6 +55,8 @@ const posts: Array<Posts> = [
   }
 ]
 const Post = () => {
+  const router = useRouter()
+
   return (
     <Card>
       {posts.map((post, index) => (
@@ -68,9 +70,7 @@ const Post = () => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Button className="ml-6 mt-3 rounded-full" size="icon" variant="outline">
-                      <Link href="/post"><Eye /></Link>
-                    </Button>
+                    <Button className="ml-6 mt-3 rounded-full" size="icon" variant="outline" onClick={() => router.push('/post/12345')}><Eye /></Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <span>See detailed post</span>
