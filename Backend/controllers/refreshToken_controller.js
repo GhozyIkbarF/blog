@@ -11,6 +11,7 @@ export const refreshToken = async (req, res) => {
                 user: {
                     select: {
                         id: true,
+                        name: true,
                         username: true,
                         email: true
                     }
@@ -21,10 +22,11 @@ export const refreshToken = async (req, res) => {
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
             if (err) return res.sendStatus(403);
             const userId = token.user.id
+            const name = token.user.name
             const username = token.user.username
             const userEmail= token.user.email
-            const accessToken = jwt.sign({userId, username, userEmail}, process.env.ACCESS_TOKEN_SECRET, {
-                expiresIn: 5*60*60
+            const accessToken = jwt.sign({userId, name, username, userEmail}, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: 5*60
             })
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
@@ -32,9 +34,6 @@ export const refreshToken = async (req, res) => {
                 // secure: true //untuk htpps
             })
             res.json({
-                id: userId,
-                username: username,
-                email: userEmail,
                 accessToken: accessToken
             }); 
         })

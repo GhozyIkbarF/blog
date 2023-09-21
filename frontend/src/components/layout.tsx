@@ -9,7 +9,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <>
       <main className="min-h-screen w-4/6 py-5 mx-auto flex flex-col gap-2">
-        <Navbar />
+        <Navbar/>
         {children}
       </main>
     </>

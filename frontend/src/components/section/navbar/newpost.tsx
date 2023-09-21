@@ -38,10 +38,10 @@ const categories: Array<Categories> = [
 const NewPost = () => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("")
-  const [publish, setPublish] = useState(<Globe />)
+  const [publicPost, setPublicPost] = useState<Boolean>(true)
 
-  function handlePublish() {
-    setPublish(<Lock />)
+  const handlePublicPost = () => {
+    setPublicPost(!publicPost)
   }
 
   return (
@@ -81,10 +81,10 @@ const NewPost = () => {
             <TooltipProvider>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" onClick={handlePublish}>{publish}</Button>
+                  <Button variant="outline" size="icon" onClick={handlePublicPost}>{publicPost ? <Globe /> : <Lock />}</Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Everybody can see your post</p>
+                  {publicPost ? <p>Everybody can see your post</p> : <p>Only you can see your post</p>}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

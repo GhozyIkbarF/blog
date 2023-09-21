@@ -49,7 +49,10 @@ const Login = () => {
     console.log(data);
     
     try {
-      const res = await axios.post(`${baseURL}/login`, data, {headers});
+      const res = await axios.post(`${baseURL}/login`, data, {
+        headers, 
+        withCredentials: true,
+      });
       toast({
         title: "Sign Up Success!",
         duration: 2500,

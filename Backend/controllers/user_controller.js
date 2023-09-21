@@ -47,41 +47,40 @@ export const login = async (req, res) => {
         const match = await bcrypt.compare(password, user.password)
         if (!match) return res.status(404).json({ error: 'password is wrong' })
         const userId = user.id
+        const name = user.name
         const username = user.username
         const userEmail= user.email
-        const accessToken = jwt.sign({userId, username, userEmail}, process.env.ACCESS_TOKEN_SECRET, {
+        const accessToken = jwt.sign({userId, name, username, userEmail}, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: 5*60
         })
-        const refreshToken = jwt.sign({userId, username, userEmail}, process.env.REFRESH_TOKEN_SECRET, {
+        const refreshToken = jwt.sign({userId, name, username, userEmail}, process.env.REFRESH_TOKEN_SECRET, {
             expiresIn: '1d'
         })
 
-        // if(user.refresh_token !== null){
-        //     await prismaClient.refreshToken.update({
-        //         where: { userId: user.id },
-        //         data: {
-        //             token: refreshToken
-        //         }
-        //     })
-        // }else{
-        //     await prismaClient.refreshToken.create({
-        //         data: {
-        //             token: refreshToken,
-        //             userId: user.id
-        //         }
-        //     })
-        // }
-        // res.cookie('refreshToken', refreshToken, {
-        //     httpOnly: true,
-        //     // maxAge: 10*60,
-        //     maxAge: 24*60*60*1000,
-        //     // secure: true //untuk htpps
-        // })
+        if(user.refresh_token !== null){
+            await prismaClient.refreshToken.update({
+                where: { userId: user.id },
+                data: {
+                    token: refreshToken
+                }
+            })
+        }else{
+            await prismaClient.refreshToken.create({
+                data: {
+                    token: refreshToken,
+                    userId: user.id
+                }
+            })
+        }
+        res.cookie('refreshToken', refreshToken, {
+            path: '/',
+            maxAge: 24*60*60*1000,
+            httpOnly: true, 
+            secure: true,   
+            sameSite: 'strict', 
+        })
         res.json({
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            // accessToken: accessToken
+            accessToken: accessToken
         }); 
     } catch (error) {
         console.error(error);

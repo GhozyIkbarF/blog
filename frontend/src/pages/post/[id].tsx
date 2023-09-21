@@ -1,14 +1,59 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Navbar from '../section/navbar/navbar'
-import Title from '../head'
+import Navbar from '@/components/section/navbar/navbar'
+import Title from '@/components/head'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Undo2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Badge } from '@/components/ui/badge'
+import { useRouter } from 'next/router'
+import axios from 'axios'
+
+const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+
+
+interface DetailedPost {
+  author: { name: string, username: string; email: string, photo_profile: string };
+  username: string;
+  authorId: number;
+  category: string;
+  content: string;
+  createdAt: string;
+  id: number;
+  image: string;
+  published: boolean;
+  title: string;
+  updatedAt: string;
+}
 
 const DetailedPost = () => {
+  const [detailPost, setDetailPost] = useState<DetailedPost>()
+  const router = useRouter();
+  const id: number | undefined = parseInt(router.query.id as string);
+
+  
+  const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+  
+  const getDetailPost = async (id: number) => {
+    try{
+      const res = await axios.get(`${baseURL}/post/${id}`)
+      setDetailPost(res.data);
+      console.log(res);
+    }catch(err){
+      console.log(err);
+    }
+  }
+  
+  useEffect(() => {
+    if(!id) return
+    // const queryString = window.location.search;
+    // const urlParams = new URLSearchParams(queryString);
+    // const paramId = urlParams.get('id');
+    getDetailPost(id);
+  },[id])
+  
   return (
     <>
       <Title title="Home / The Social" />
@@ -35,18 +80,19 @@ const DetailedPost = () => {
               </div>
               <CardHeader className="flex flex-row space-y-0 pb-6">
                 <Avatar className="w-12 h-12">
-                  <AvatarImage src="https://github.com/yandaagil.png" />
-                  <AvatarFallback>YA</AvatarFallback>
+                  <AvatarImage src={detailPost?.author.photo_profile}/>
+                  <AvatarFallback>{detailPost?.author.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <CardTitle className="ml-3 text-lg">Yanda Agil</CardTitle>
-                  <CardDescription className="ml-3 [&:not(:first-child)]:mt-0">@yandaagil</CardDescription>
+                  <CardTitle className="ml-3 text-lg">{detailPost?.author.username}</CardTitle>
+                  <CardDescription className="ml-3 [&:not(:first-child)]:mt-0">{detailPost?.author.email}</CardDescription>
                 </div>
               </CardHeader>
               <article className="flex flex-col">
                 <CardContent>
-                  <CardTitle className="mb-3">Lorem, ipsum dolor.</CardTitle>
-                  <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime placeat nisi, excepturi doloribus exercitationem suscipit unde aut minus similique architecto animi reiciendis repellat voluptatem est, amet quae expedita tempora soluta cum vitae delectus? Odit officia architecto optio id ipsum aliquid recusandae repudiandae. Cumque, cum! Vel excepturi placeat incidunt odit. Non ipsa repellat culpa inventore possimus reiciendis porro architecto, commodi optio, ducimus quasi est veritatis perferendis libero provident nulla reprehenderit consequatur at saepe sapiente dolorum! Quas ducimus sed esse unde, cum facere. Laudantium tempora cupiditate explicabo laboriosam in iure, autem, minima et illo sint expedita neque assumenda harum. Similique, hic delectus.</p>
+                  <Badge className="mb-3">{detailPost?.category}</Badge>
+                  <h2 className="mb-3">{detailPost?.title}</h2>
+                  <p>{detailPost?.content}</p>
                 </CardContent>
               </article>
               <CardDescription className="m-0 px-6 pb-6 [&:not(:first-child)]:mt-0">6:49 PM · Sep 19, 2023</CardDescription>

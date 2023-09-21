@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,9 +17,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from '@/components/ui/badge'
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
+
 
 interface Post {
-  author: { username: string; email: string}
+  author: { name: string, username: string; email: string, photo_profile: string };
   username: string;
   authorId: number;
   category: string;
@@ -29,28 +33,38 @@ interface Post {
   published: boolean;
   title: string;
   updatedAt: string;
-
 }
 
 interface Repo {
   posts: Post[];
 };
 
-const Post = () => {
-  const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+// export const getServerSideProps = (async (context) => {
+  //   const res = await fetch(`${baseURL}/post`);
+  //   const repo = await res.json()
+//   return { props: { repo: repo } }
+// }) satisfies GetServerSideProps<{
+//   repo: Repo
+// }>
 
+const Post = () => {
+  
+  const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+  
   const [data, setData] = useState<Repo | null>(null);
   const [isLoading, setLoading] = useState<Boolean>(true);
-
+  
+  const router = useRouter();
+  
   useEffect(() => {
-    fetch(`${baseURL}/post`)
-      .then((res) => res.json())
-      .then((data: Repo) => {
-        setData(data);
-        setLoading(false);
-      });
-  }, []);
-
+      fetch(`${baseURL}/post`)
+        .then((res) => res.json())
+        .then((data: Repo) => {
+            setData(data);
+            setLoading(false);
+          });
+      }, []);
+      
   if (isLoading) return <p className="text-center mt-10">Loading...</p>;
   if (!data) return <p className="text-center" >No post data</p>;
 
@@ -61,22 +75,18 @@ const Post = () => {
           <div className="flex flex-row">
             <div className="flex flex-col">
               <Avatar className="ml-6 mt-6">
-                <AvatarImage src={post.image} />
-                <AvatarFallback>YA</AvatarFallback>
+                <AvatarImage src={post.author.photo_profile} />
+                <AvatarFallback>{post.author.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
               </Avatar>
               <TooltipProvider>
-                <Tooltip>
+                <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Button
-                      className="ml-6 mt-3 rounded-full"
-                      size="icon"
-                      variant="outline"
-                    >
-                      <Eye />
+                    <Button className="ml-6 mt-3 rounded-full" size="icon" variant="outline" onClick={() => router.push(`/post/${post.id}`)}>
+                      <Eye/>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>See detailed post</p>
+                    <span>See detailed post</span>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -88,10 +98,9 @@ const Post = () => {
                 <CardDescription className="ml-2">3 hours</CardDescription>
               </CardHeader>
               <CardContent>
-                <CardTitle className="mb-3">{post.title}</CardTitle>
-                <p>
-                  {post.content}
-                </p>
+                <CardTitle>{post.title}</CardTitle>
+                {post.category ? <Badge className="mt-3">{post.category}</Badge> : null}
+                <p className="line-clamp-3">{post.content}</p>
               </CardContent>
             </div>
           </div>
