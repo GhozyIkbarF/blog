@@ -1,4 +1,5 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -10,6 +11,8 @@ type LayoutProps = {
 };
 
 const SettingsLayout = ({ children }: LayoutProps) => {
+  const router = useRouter()
+
   return (
     <>
       <section>
@@ -19,12 +22,12 @@ const SettingsLayout = ({ children }: LayoutProps) => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Button className="rounded-full" size="icon" variant="ghost">
-                      <Link href="/"><Undo2 /></Link>
+                    <Button className="rounded-full" size="icon" variant="ghost" onClick={() => router.back()}>
+                      <Undo2 />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <span>Back to Home</span>
+                    <span>Back to Previous Page</span>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
