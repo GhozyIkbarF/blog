@@ -1,6 +1,5 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { TabsContent } from "@/components/ui/tabs"
 import { Separator } from '@/components/ui/separator'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -41,7 +40,7 @@ const Profile = () => {
   ];
 
   return (
-    <TabsContent value="profile">
+    <>
       <h4>Profile</h4>
       <small className="muted-text">This is how others will see you on the site.</small>
       <Separator className="my-6" />
@@ -71,7 +70,7 @@ const Profile = () => {
             </DialogHeader>
             <div className="flex flex-col gap-4 py-4">
               <Label htmlFor="Password" className="after:content-['*'] after:text-red-500">Password </Label>
-              <Input id="password" />
+              <Input id="password" placeholder="Enter your password" />
               <small className="text-red-500">an example of error message</small>
             </div>
             <DialogFooter>
@@ -80,7 +79,7 @@ const Profile = () => {
           </DialogContent>
         </Dialog>
       </form>
-    </TabsContent>
+    </>
   )
 }
 
