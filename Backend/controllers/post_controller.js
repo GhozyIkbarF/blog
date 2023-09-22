@@ -34,7 +34,10 @@ export const getPosts = async (req, res) => {
             include: {
                     author: {
                         select: {
-                            username: true
+                            name: true,
+                            username: true,
+                            email: true, 
+                            photo_profile: true,
                         }
                 }
             }
@@ -44,7 +47,7 @@ export const getPosts = async (req, res) => {
                 post.image = `${baseUrl}/${post.image}`
             })
         }
-        res.status(200).json(posts)
+        res.status(200).json({posts: posts})
     }catch(err){
         res.status(500).json({message: err.message });
     }
@@ -54,13 +57,20 @@ export const getPost = async (req, res) => {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     try{
         const post = await prismaClient.post.findUnique({
-            where: {id: parseInt(req.params.id)}
+            where: {id: parseInt(req.params.id)},
+            include: {
+                author: {
+                    select: {
+                        name: true,
+                        username: true,
+                        email: true, 
+                        photo_profile: true,
+                    }
+            }
+        }
         })
         post.image = `${baseUrl}/${post.image}`
-        res.status(200).json({ 
-            data: post,
-            message: 'post is successfully updated'
-        })
+        res.status(200).json(post)
     }catch(err){
         res.status(500).json({message: err.message });
     }
@@ -69,6 +79,7 @@ export const getPost = async (req, res) => {
 export const updatePost = async (req, res) => {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const { authorId, title, image, content, published, category } = req.body;
+    console.log(req.file);
     const file = req.file?.path.split('\\').slice(1).join('\\');
     try{
         let updateData = { authorId, title, content, published, category };

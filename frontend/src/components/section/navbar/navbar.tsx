@@ -9,12 +9,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Moon, Sun } from 'lucide-react'
 import NewPost from './newpost'
 import AvatarProfile from './avatarprofile'
-import LoginBtn from './loginbtn'
+import LoginBtn from './loginbtn';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store'
 
 const Navbar = () => {
-  const { setTheme } = useTheme()
+  const { setTheme } = useTheme();
   const [lightMode, setLightMode] = useState('light');
 
+  const { isLogin }  =  useSelector((state: RootState) => state.utils);
+  
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
@@ -28,13 +32,12 @@ const Navbar = () => {
     setLightMode(newTheme);
     localStorage.setItem('theme', newTheme);
   };
-
+  
   return (
     <Card className="p-3">
       <div className="flex justify-between items-center">
         <div className="flex gap-2 justify-self-start">
-          {/* <LoginBtn /> */}
-          <AvatarProfile />
+          {isLogin ? <AvatarProfile />: <LoginBtn /> }
         </div>
         <Link href="/" className="absolute right-1/2 translate-x-2/4">
           <h3>The Social.</h3>
@@ -50,7 +53,7 @@ const Navbar = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <NewPost />
+          {isLogin && <NewPost />}
         </div>
       </div>
     </Card>

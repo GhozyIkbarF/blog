@@ -11,6 +11,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CREATE_USER } from "@/validation";
 import { useRouter } from "next/router";
+import axios from 'axios'
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -18,6 +19,7 @@ interface Inputs {
   name: string;
   username: string;
   email: string;
+  photo_profile?: null | string;
   password: string;
   confirmPassword: string;
 }
@@ -40,25 +42,37 @@ const SignUp = () => {
       name: "",
       username: "",
       email: "",
+      photo_profile: "",
       password: "",
       confirmPassword: "",
     },
   });
 
+  const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+  const headers = {
+    'Content-Type': 'application/json'
+  }
+  
   const { toast } = useToast();
-
   const onSubmit = async (data: Inputs) => {
+    console.log(data);
+    
     try {
-      console.log(data);
+      const res = await axios.post(`${baseURL}/register`, data, {headers});
       toast({
         title: "Sign Up Success!",
         duration: 2500,
       })
       reset();
-      clearErrors(["name", "username", "email", "password", "confirmPassword"]);
+      console.log(res);
+      clearErrors(["name", "username", "email", "photo_profile", "password", "confirmPassword"]);
       router.push('/login')
     } catch (err) {
       console.log(err);
+      toast({
+        title: "Sign Up Failed!",
+        duration: 2500,
+      })
     }
   };
 
@@ -94,6 +108,14 @@ const SignUp = () => {
       placeholder: "someone@example.com",
       error: errors.email,
       errorMessage: errors.email?.message,
+    },
+    {
+      label: "Photo profile",
+      type: "text",
+      id: "photo_profile",
+      placeholder: "Enter your photo profile",
+      error: errors.photo_profile,
+      errorMessage: errors.photo_profile?.message,
     },
     {
       label: "Password",
@@ -140,9 +162,9 @@ const SignUp = () => {
                             | "name"
                             | "username"
                             | "email"
+                            | "photo_profile"
                             | "password"
                             | "confirmPassword",
-                            { required: true }
                           )}
                           id={item.id}
                           placeholder={item.placeholder}

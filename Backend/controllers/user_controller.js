@@ -4,13 +4,15 @@ import jwt from 'jsonwebtoken'
 
 
 export const register = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { name, username, email, photo_profile, password } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await prismaClient.user.create({
             data: {
+                name: name,
                 email: email,
                 username: username,
+                photo_profile: photo_profile,
                 password: hashedPassword,
             },
         })
@@ -41,16 +43,19 @@ export const login = async (req, res) => {
                 }
             }
         });
-        if (!user) return res.status(404).json({ error: 'email is wrong' });
+        if (!user) return res.status(404).json('email is wrong' );
         const match = await bcrypt.compare(password, user.password)
         if (!match) return res.status(404).json({ error: 'password is wrong' })
         const userId = user.id
+        const name = user.name
         const username = user.username
         const userEmail= user.email
-        const accessToken = jwt.sign({userId, username, userEmail}, process.env.ACCESS_TOKEN_SECRET, {
+        // let photoProfile = ""
+        // if(user.photo_profile !== null) photoProfile = user.photo_profile
+        const accessToken = jwt.sign({userId, name, username, userEmail}, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: 5*60
         })
-        const refreshToken = jwt.sign({userId, username, userEmail}, process.env.REFRESH_TOKEN_SECRET, {
+        const refreshToken = jwt.sign({userId, name, username, userEmail}, process.env.REFRESH_TOKEN_SECRET, {
             expiresIn: '1d'
         })
 
@@ -70,15 +75,14 @@ export const login = async (req, res) => {
             })
         }
         res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            // maxAge: 10*60,
+            path: '/',
             maxAge: 24*60*60*1000,
-            // secure: true //untuk htpps
+            httpOnly: true, 
+            // secure: true,   
+            // sameSite: 'strict', 
         })
         res.json({
-            id: user.id,
-            username: user.username,
-            email: user.email,
+            photoProfile: user.photo_profile,
             accessToken: accessToken
         }); 
     } catch (error) {
@@ -136,19 +140,25 @@ export const getUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { username, email, password } = req.body;
+    const { name, username, email, password } = req.body;
 
     try {
-        let updateData = { username, email };
-        if (password) {
-            const hashPassword = await bcrypt.hash(password, 10);
-            updateData.password = hashPassword;
-        }
+        let updateData = { name, username, email };
+        const user = await prismaClient.user.findUnique({
+            where: { id: parseInt(id) },
+            select: { password: true}
+        });
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return res.status(404).json('password is wrong' );
         const updatedUser = await prismaClient.user.update({
             where: { id: parseInt(id) },
             data: updateData,
+            select: {
+                name: true,
+                username: true,
+                email: true,
+            }
         });
-
         res.json(updatedUser);
     } catch (error) {
         console.error(error);
