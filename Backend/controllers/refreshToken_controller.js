@@ -8,12 +8,14 @@ export const refreshToken = async (req, res) => {
         const token  = await prismaClient.refreshToken.findUnique({
             where: { token: refreshToken }, 
             include: {
+                // user: true
                 user: {
                     select: {
                         id: true,
                         name: true,
                         username: true,
-                        email: true
+                        email: true,
+                        // photo_profile: true
                     }
                 }
             }
@@ -25,15 +27,20 @@ export const refreshToken = async (req, res) => {
             const name = token.user.name
             const username = token.user.username
             const userEmail= token.user.email
+            // let photoProfile = ""
+            // if(user.photo_profile !== null) photoProfile = user.photo_profile
             const accessToken = jwt.sign({userId, name, username, userEmail}, process.env.ACCESS_TOKEN_SECRET, {
                 expiresIn: 5*60
             })
             res.cookie('refreshToken', refreshToken, {
+                path: '/',
                 httpOnly: true,
                 maxAge: 24*60*60*1000,
                 // secure: true //untuk htpps
             })
             res.json({
+                // photoProfile: user.photo_profile,
+                photoProfile: "",
                 accessToken: accessToken
             }); 
         })

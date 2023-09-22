@@ -50,6 +50,8 @@ export const login = async (req, res) => {
         const name = user.name
         const username = user.username
         const userEmail= user.email
+        // let photoProfile = ""
+        // if(user.photo_profile !== null) photoProfile = user.photo_profile
         const accessToken = jwt.sign({userId, name, username, userEmail}, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: 5*60
         })
@@ -76,10 +78,11 @@ export const login = async (req, res) => {
             path: '/',
             maxAge: 24*60*60*1000,
             httpOnly: true, 
-            secure: true,   
-            sameSite: 'strict', 
+            // secure: true,   
+            // sameSite: 'strict', 
         })
         res.json({
+            photoProfile: user.photo_profile,
             accessToken: accessToken
         }); 
     } catch (error) {
@@ -141,15 +144,21 @@ export const updateUser = async (req, res) => {
 
     try {
         let updateData = { name, username, email };
-        if (password) {
-            const hashPassword = await bcrypt.hash(password, 10);
-            updateData.password = hashPassword;
-        }
+        const user = await prismaClient.user.findUnique({
+            where: { id: parseInt(id) },
+            select: { password: true}
+        });
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return res.status(404).json('password is wrong' );
         const updatedUser = await prismaClient.user.update({
             where: { id: parseInt(id) },
             data: updateData,
+            select: {
+                name: true,
+                username: true,
+                email: true,
+            }
         });
-
         res.json(updatedUser);
     } catch (error) {
         console.error(error);

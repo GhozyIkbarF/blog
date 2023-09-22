@@ -15,7 +15,6 @@ import axios from 'axios'
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
 
-
 interface Inputs {
   name: string;
   username: string;
@@ -111,10 +110,10 @@ const SignUp = () => {
       errorMessage: errors.email?.message,
     },
     {
-      label: "Photo ptofile",
+      label: "Photo profile",
       type: "text",
       id: "photo_profile",
-      placeholder: "enter yout photo profile",
+      placeholder: "Enter your photo profile",
       error: errors.photo_profile,
       errorMessage: errors.photo_profile?.message,
     },

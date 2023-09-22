@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/router";
 import { Eye, EyeOff } from "lucide-react"
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LOGIN } from '@/validation'
 import axios from 'axios'
@@ -18,8 +18,6 @@ interface Inputs {
   email: string;
   password: string;
 }
-
-
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState<Boolean>(false);
@@ -46,8 +44,6 @@ const Login = () => {
   
   const { toast } = useToast();
   const onSubmit = async (data: Inputs) => {
-    console.log(data);
-    
     try {
       const res = await axios.post(`${baseURL}/login`, data, {
         headers, 

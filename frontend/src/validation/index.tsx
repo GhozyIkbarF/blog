@@ -39,3 +39,10 @@ export const LOGIN = Yup.object().shape({
     .required("Email is required"),
   password: Yup.string().required("Password is required"),
 });
+
+export const EDIT_PROFILE = Yup.object().shape({
+  name: Yup.string().required("name is required"),
+  username: Yup.string().required("username is required"),
+  email: Yup.string().email("Must a valid email address").required("Email is required"),
+  password: Yup.string().required('Password is required'),
+});
