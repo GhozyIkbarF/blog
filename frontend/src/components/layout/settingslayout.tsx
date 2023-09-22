@@ -6,11 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Undo2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-type LayoutProps = {
-  children: React.ReactNode,
-};
-
-const SettingsLayout = ({ children }: LayoutProps) => {
+const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
 
   return (
@@ -37,14 +33,10 @@ const SettingsLayout = ({ children }: LayoutProps) => {
               <aside className="w-[25%]">
                 <ul className="list-none">
                   <li>
-                    <Link href="/profile/settings/profile">
-                      <Button className="w-full justify-start" variant="outline">Profile</Button>
-                    </Link>
+                    <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/profile/settings/profile")}>Profile</Button>
                   </li>
                   <li>
-                    <Link href="/profile/settings/password">
-                      <Button className="w-full justify-start" variant="outline">Password</Button>
-                    </Link>
+                    <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/profile/settings/password")}>Password</Button>
                   </li>
                 </ul>
               </aside>

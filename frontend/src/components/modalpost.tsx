@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement, ReactNode } from 'react'
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,11 +8,17 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Globe, Image as Img, ChevronsUpDown, Check, Lock, PenSquare } from "lucide-react"
+import { Globe, Image as Img, ChevronsUpDown, Check, Lock } from "lucide-react"
 
-interface Categories { value: string; label: string }
+interface categories { value: string; label: string }
 
-const categories: Array<Categories> = [
+type modalProps = {
+  modalTitle: string;
+  modalButton: string;
+  children: React.ReactNode;
+}
+
+const categories: categories[] = [
   {
     value: "sport",
     label: "Sport",
@@ -35,10 +41,10 @@ const categories: Array<Categories> = [
   },
 ]
 
-const NewPost = () => {
+const ModalPost = ({ modalTitle, modalButton, children }: modalProps) => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("")
-  const [publicPost, setPublicPost] = useState<Boolean>(true)
+  const [publicPost, setPublicPost] = useState(true)
 
   const handlePublicPost = () => {
     setPublicPost(!publicPost)
@@ -47,11 +53,11 @@ const NewPost = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="font-bold"><PenSquare className="mr-2" /><span>New Post</span></Button>
+        {children}
       </DialogTrigger>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>New Post</DialogTitle>
+          <DialogTitle>{modalTitle}</DialogTitle>
           <DialogDescription>
             What&apos;s on your mind?
           </DialogDescription>
@@ -63,7 +69,7 @@ const NewPost = () => {
           </div>
           <div className="flex flex-col space-y-3">
             <Label htmlFor="content">Paragraph</Label>
-            <Textarea className="min-h-[200px]" placeholder="Write your mind here" />
+            <Textarea className="min-h-[200px]" name="content" id="content" placeholder="Write your mind here" />
           </div>
         </div>
         <DialogFooter className="flex-col sm:justify-between">
@@ -125,11 +131,11 @@ const NewPost = () => {
               </PopoverContent>
             </Popover>
           </div>
-          <Button type="submit">Post</Button>
+          <Button type="submit">{modalButton}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
 
-export default NewPost
+export default ModalPost

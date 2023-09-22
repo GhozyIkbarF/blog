@@ -1,12 +1,13 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Eye } from "lucide-react"
+import { CardContent, CardDescription, CardTitle } from "@/components/ui/card"
+import { Eye, Trash2, Pencil, MoreHorizontal, Globe, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import ModalPost from '../modalpost'
 
 interface posts {
   avatar: string
@@ -16,7 +17,7 @@ interface posts {
   username: string
   time: string
   title: string
-  category: string | null
+  category?: string
   content: string
 }
 
@@ -39,7 +40,7 @@ const posts: posts[] = [
     name: "Ghozy Ikbar",
     username: "@ghozyikbar",
     time: "5 hours",
-    title: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    title: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus, sunt? adipisicing elit",
     category: "Technology",
     content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut cupiditate vero tempore, recusandae assumenda facilis, quos sed ipsam laudantium iusto laborum non aliquid aliquam dolorum eaque, impedit neque veritatis harum hic. Repudiandae sit illum velit! Numquam, debitis reprehenderit! Animi harum quam quibusdam omnis, repudiandae voluptates eaque, illum magni dolore quidem molestiae mollitia hic qui temporibus. Error, enim? Libero, rem amet! Perferendis nesciunt blanditiis recusandae expedita repudiandae? Modi unde quibusdam odit voluptas suscipit labore veniam facilis repellendus natus libero dolorem fugit, dolorum temporibus ratione maiores exercitationem quos, dignissimos vel aspernatur saepe doloribus! Laboriosam, incidunt nesciunt consequatur labore laborum quos explicabo iusto!."
   },
@@ -51,52 +52,73 @@ const posts: posts[] = [
     username: "@muhammadasharul",
     time: "7 hours",
     title: "Lorem ipsum dolor sit amet consectetur.",
-    category: null,
     content: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Accusantium odio quaerat eius vitae neque fugit provident? Impedit, ut voluptatibus quas ratione voluptate quae dolore consectetur sunt provident doloribus incidunt eveniet nihil libero quo labore voluptas perferendis dolores voluptatem, alias tenetur culpa, iusto ea? Quo beatae, esse fugit dolor non adipisci tempore perferendis. Molestiae eius, ab iste, odio velit quidem hic similique in repudiandae eveniet aperiam cupiditate quibusdam quo quod soluta temporibus iure libero et consequuntur? Quisquam deserunt ut et ipsum molestias praesentium ullam dignissimos. Delectus eum, assumenda recusandae quod rem, molestias perferendis unde amet hic quaerat aperiam, eligendi ipsa est!"
   }
 ]
-const Post = () => {
+
+const ProfilePosts = () => {
   const router = useRouter()
 
   return (
-    <Card>
+    <article className="flex flex-col">
+      <h4 className="pb-3 text-center">{posts.length} Posts in all categories</h4>
+      <Separator />
       {posts.map((post, index) => (
         <section key={index}>
           <div className="flex flex-row">
             <div className="flex flex-col">
-              <Avatar className="ml-6 mt-6">
-                <AvatarImage src={post.avatar} />
-                <AvatarFallback>{post.initial}</AvatarFallback>
-              </Avatar>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Button className="ml-6 mt-3 rounded-full" size="icon" variant="outline" onClick={() => router.push('/post/12345')}><Eye /></Button>
+                    <Button className="ml-6 mt-6 rounded-full" size="icon" variant="outline" onClick={() => router.push('/post/12345')}><Eye /></Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <span>See detailed post</span>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
+              <ModalPost modalButton="Update" modalTitle="Edit Post">
+                <Button className="ml-6 mt-3 rounded-full" size="icon" variant="ghost">
+                  <Pencil />
+                </Button>
+              </ModalPost>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className="ml-6 mt-3 rounded-full" size="icon" variant="ghost">
+                    <Trash2 className="text-red-500" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. After you click the post will be deleted.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <Button variant="destructive">Delete</Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
             <article className="flex flex-col">
-              <CardHeader className="flex flex-row space-y-0 pb-3">
-                <CardTitle className="text-sm">{post.name}</CardTitle>
-                <CardDescription className="ml-2">{post.username}</CardDescription>
-                <CardDescription className="ml-2">{post.time}</CardDescription>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6 pb-3">
                 <CardTitle className="line-clamp-1">{post.title}</CardTitle>
-                {post.category !== null ? <Badge className="mt-3">{post.category}</Badge> : null}
+                {post.category ? <Badge className="mt-3">{post.category}</Badge> : null}
                 <p className="line-clamp-3">{post.content}</p>
               </CardContent>
+              <footer className="m-0 px-6 pb-6 flex flex-row text-center">
+                {/* <Globe className="w-[18px] h-[18px] text-muted-foreground" /> */}
+                <CardDescription className="[&:not(:first-child)]:mt-0">6:49 PM · Sep 19, 2023</CardDescription>
+              </footer>
             </article>
           </div>
           {index !== posts.length - 1 ? <Separator /> : null}
         </section>
       ))}
-    </Card>
+    </article>
   )
 }
 
-export default Post
+export default ProfilePosts

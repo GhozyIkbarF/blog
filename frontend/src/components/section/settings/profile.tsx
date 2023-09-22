@@ -48,8 +48,8 @@ const Profile = () => {
         <div className="grid w-full items-center gap-5">
           {inputData.map((item, index) => (
             <div key={index} className="flex flex-col">
-              <Label htmlFor={item.label}>{item.label}</Label>
-              <Input type={item.type} id={item.id} className="mt-2" placeholder={item.placeholder} />
+              <Label htmlFor={item.id}>{item.label}</Label>
+              <Input type={item.type} id={item.id} className="mt-2" placeholder={item.placeholder} autoComplete="on" />
               <small className="muted-text mt-1">{item.desc}</small>
               {<small className="text-red-500">{item.error}</small> && <small className="text-red-500">{item.errorMessage}</small>}
             </div>

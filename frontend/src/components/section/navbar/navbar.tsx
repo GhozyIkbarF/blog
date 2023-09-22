@@ -1,18 +1,19 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useTheme } from "next-themes"
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Moon, Sun } from 'lucide-react'
-import NewPost from './newpost'
+import { Moon, Sun, PenSquare } from 'lucide-react'
+import ModalPost from '../../modalpost'
 import AvatarProfile from './avatarprofile'
 import LoginBtn from './loginbtn'
 
 const Navbar = () => {
   const { setTheme } = useTheme()
+  const router = useRouter()
   const [lightMode, setLightMode] = useState('light');
 
   useEffect(() => {
@@ -26,7 +27,6 @@ const Navbar = () => {
     const newTheme = lightMode === 'dark' ? 'light' : 'dark';
     setTheme(newTheme)
     setLightMode(newTheme);
-    localStorage.setItem('theme', newTheme);
   };
 
   return (
@@ -36,9 +36,7 @@ const Navbar = () => {
           {/* <LoginBtn /> */}
           <AvatarProfile />
         </div>
-        <Link href="/" className="absolute right-1/2 translate-x-2/4">
-          <h3>The Social.</h3>
-        </Link>
+        <h3 className="absolute right-1/2 translate-x-1/2 cursor-pointer" onClick={() => router.push("/")}>The Social.</h3>
         <div className="flex gap-2 justify-self-end">
           <TooltipProvider>
             <Tooltip delayDuration={0}>
@@ -50,7 +48,11 @@ const Navbar = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <NewPost />
+          <ModalPost modalTitle="New Post" modalButton="Post">
+            <Button className="font-bold">
+              <PenSquare className="mr-2" /><span>New Post</span>
+            </Button>
+          </ModalPost>
         </div>
       </div>
     </Card>

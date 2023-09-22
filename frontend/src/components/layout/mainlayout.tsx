@@ -2,11 +2,7 @@ import React from 'react'
 import Navbar from '../section/navbar/navbar'
 import Title from '../head';
 
-type LayoutProps = {
-  children: React.ReactNode,
-};
-
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Title title="Home / The Social" />

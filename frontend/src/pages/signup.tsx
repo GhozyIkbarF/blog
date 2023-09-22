@@ -146,6 +146,7 @@ const SignUp = () => {
                           )}
                           id={item.id}
                           placeholder={item.placeholder}
+                          autoComplete="on"
                         />
                       ) : (
                         <div className="relative">

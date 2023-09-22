@@ -1,6 +1,6 @@
 import Head from "next/head"
 
-const Title = ({ title }: { title: string }) => {
+const Title: React.FC<{ title: string }> = ({ title }) => {
   return (
     <Head>
       <title>{title}</title>
