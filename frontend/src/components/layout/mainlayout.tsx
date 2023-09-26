@@ -42,7 +42,8 @@ const Layout = ({ children }: LayoutProps) => {
         }));
       } 
     } catch (err) {
-      console.error(err);
+      // console.error(err);
+      dispatch(setIsLogin(false));
     }
   };
 

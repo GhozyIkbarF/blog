@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-export const createPostValidation = async (req, res, next) => {
+const createPostValidation = async (req, res, next) => {
     const userSchema = Joi.object({
         authorId: Joi.number().required().messages({
             'number.empty': 'id of author cannot be empty',
@@ -29,7 +29,8 @@ export const createPostValidation = async (req, res, next) => {
     }
     next();
 };
-export const deletePostValidation = async (req, res, next) => {
+
+const deletePostValidation = async (req, res, next) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) return res.status(401).json({ message: "Invalid refresh token" });
     try {
@@ -53,3 +54,8 @@ export const deletePostValidation = async (req, res, next) => {
 
     }
 };
+
+module.exports = {
+    createPostValidation,
+    deletePostValidation
+}

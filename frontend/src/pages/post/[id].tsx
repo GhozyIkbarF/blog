@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { createdAt } from "@/Utlis/date";
 
 const baseURL = process.env.NEXT_PUBLIC_API_CALL;
 
@@ -114,7 +115,7 @@ const DetailedPost = () => {
             </CardContent>
           </article>
           <CardDescription className="m-0 px-6 pb-6 [&:not(:first-child)]:mt-0">
-            6:49 PM · Sep 19, 2023
+            {createdAt(detailPost?.createdAt)}
           </CardDescription>
         </section>
       </Card>

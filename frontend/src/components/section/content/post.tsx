@@ -7,58 +7,37 @@ import { Eye } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
-
-interface Post {
-  author: { name: string, username: string; email: string, photo_profile: string };
-  username: string;
-  authorId: number;
-  category: string;
-  content: string;
-  createdAt: string;
-  id: number;
-  image: string;
-  published: boolean;
-  title: string;
-  updatedAt: string;
-}
-
-interface Repo {
-  posts: Post[];
-};
-
-// export const getServerSideProps = (async (context) => {
-  //   const res = await fetch(`${baseURL}/post`);
-  //   const repo = await res.json()
-//   return { props: { repo: repo } }
-// }) satisfies GetServerSideProps<{
-//   repo: Repo
-// }>
+import { timePosted } from "@/Utlis/date";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setPosts } from "@/Utlis";
+import { RootState } from "@/store";
 
 const Post = () => {
   
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
   
-  const [data, setData] = useState<Repo | null>(null);
   const [isLoading, setLoading] = useState<Boolean>(true);
+  const { posts } = useSelector((state:RootState) => state.utils);
   
   const router = useRouter();
+  const dispatch = useDispatch();
   
   useEffect(() => {
-      fetch(`${baseURL}/post`)
+      fetch(`${baseURL}/posts`)
         .then((res) => res.json())
-        .then((data: Repo) => {
-            setData(data);
+        .then((data) => {
+            dispatch(setPosts(data));
             setLoading(false);
           });
       }, []);
       
   if (isLoading) return <p className="text-center mt-10">Loading...</p>;
-  if (!data) return <p className="text-center" >No post data</p>;
+  if (!posts) return <p className="text-center" >No post data</p>;
 
   return (
     <Card>
-      {data.posts.map((post, index ) => (
+      {posts?.map((post: any, index: any) => (
         <React.Fragment key={index}>
           <div className="flex flex-row">
             <div className="flex flex-col">
@@ -83,7 +62,7 @@ const Post = () => {
               <CardHeader className="flex flex-row space-y-0 pb-3">
                 <CardTitle className="text-sm">{post.author.username}</CardTitle>
                 <CardDescription className="ml-2">{post.author.email}</CardDescription>
-                <CardDescription className="ml-2">3 hours</CardDescription>
+                <CardDescription className="ml-2">{timePosted(post.createdAt)}</CardDescription>
               </CardHeader>
               <CardContent>
                 <CardTitle>{post.title}</CardTitle>
@@ -92,7 +71,7 @@ const Post = () => {
               </CardContent>
             </div>
           </div>
-          {index !== data?.posts.length -1 && <Separator />}
+          {index !== posts?.length -1 && <Separator />}
         </React.Fragment>
       ))}
     </Card>
