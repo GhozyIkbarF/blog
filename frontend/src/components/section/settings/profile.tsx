@@ -20,18 +20,14 @@ import { useDispatch } from "react-redux";
 import { setUserData } from "@/Utlis";
 import { RootState } from "@/store";
 import axios from "axios";
+import { useRouter } from "next/router";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Inputs {
   name: string;
   username: string;
   email: string;
   password: string;
-}
-
-interface Res {
-  name: string;
-  username: string;
-  email: string;
 }
 
 const Profile = () => {
@@ -58,6 +54,9 @@ const Profile = () => {
   });
 
   const dispatch = useDispatch()
+  const router = useRouter();
+  const { toast } = useToast();
+
   useEffect(() => {
     if(userData){
       setValue('name', userData?.name)
@@ -66,38 +65,42 @@ const Profile = () => {
     }
   },[userData]);
   
-
-
   const headers = {
     'Content-Type': 'application/json',
   }
   const onSubmit = async (data: Inputs) => {
     const baseURL = process.env.NEXT_PUBLIC_API_CALL; 
     try{
-      const res: Res = await axios.patch(`${baseURL}/user/edit/${userData.userId}`, data, {headers})
+      const res = await axios.patch(`${baseURL}/user/edit/${userData.userId}`, data, {headers})
       if(res){
-        console.log(res);
         dispatch(setUserData({
-          name: res.name,
+          name: res.data.name,
           userId: userData.userId,
-          username: res.username,
-          userEmail: res.email,
+          username: res.data.username,
+          userEmail: res.data.email,
         }
         ))
         reset();
+        router.push('/profile/settings/profile')
+        toast({
+          title: "Sign Up Success!",
+          duration: 2500,
+        })
     }
     }catch(err){
       setError('password', { type: 'custom', message: 'password is wrong' })
       console.error(err);
-      
+      toast({
+        title: "Sign Up Success!",
+        duration: 2500,
+      })
     }
   }
 
   const submitForm = () => {
     if (myForm.current) {
       console.log('submit');
-      // myForm.current.submit();
-      handleSubmit
+      myForm.current.submit();
     }
   }
   const inputData = [
@@ -177,9 +180,9 @@ const Profile = () => {
               {errors.password && <small className="text-red-500">{errors.password?.message}</small>}
             </div>
             <DialogFooter>
-              <Button type="submit" onClick={() => submitForm() }>Save changes</Button>
             </DialogFooter>
           </DialogContent>
+              <Button type="submit">Save changes</Button>
         </Dialog>
       </form>
     </>

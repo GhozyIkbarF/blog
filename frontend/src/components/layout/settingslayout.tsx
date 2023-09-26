@@ -22,7 +22,7 @@ const SettingsLayout = ({ children }: LayoutProps) => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Button className="rounded-full" size="icon" variant="ghost" onClick={() => router.back()}>
+                    <Button className="rounded-full" size="icon" variant="ghost" onClick={() => router.push('/')}>
                       <Undo2 />
                     </Button>
                   </TooltipTrigger>

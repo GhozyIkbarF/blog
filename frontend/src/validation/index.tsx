@@ -46,3 +46,11 @@ export const EDIT_PROFILE = Yup.object().shape({
   email: Yup.string().email("Must a valid email address").required("Email is required"),
   password: Yup.string().required('Password is required'),
 });
+
+export const EDIT_PASSWORD = Yup.object().shape({
+  oldPassword: Yup.string().required("Password is required"),
+  newPassword: Yup.string().required("Password is required"),
+  confirmPassword: Yup.string()
+    .required("Confirm Password is required")
+    .oneOf([Yup.ref("newPassword")], "Password doesn't match"),
+});

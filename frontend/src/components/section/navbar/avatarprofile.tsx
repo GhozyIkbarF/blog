@@ -75,7 +75,7 @@ const AvatarProfile = () => {
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer">
             <AvatarImage src="https://github.com/yandaagil.png" />
-            <AvatarFallback>{userData.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
+            <AvatarFallback>{userData.name?.split('')[0].toLocaleUpperCase()}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
