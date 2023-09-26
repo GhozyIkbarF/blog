@@ -9,9 +9,10 @@ import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/router";
 import { Eye, EyeOff } from "lucide-react"
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LOGIN } from '@/validation'
+import axios from 'axios'
 
 interface Inputs {
   email: string;
@@ -19,7 +20,7 @@ interface Inputs {
 }
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState<Boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const {
@@ -36,30 +37,42 @@ const Login = () => {
     },
   })
 
-  const { toast } = useToast()
+  const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+  const headers = {
+    'Content-Type': 'application/json'
+  }
+
+  const { toast } = useToast();
+  const onSubmit = async (data: Inputs) => {
+    try {
+      const res = await axios.post(`${baseURL}/login`, data, {
+        headers,
+        withCredentials: true,
+      });
+      toast({
+        title: "Login Success!",
+        duration: 2500,
+      })
+      reset();
+      console.log(res);
+      clearErrors(["email", "password"]);
+      router.push('/')
+    } catch (err) {
+      console.log(err)
+      toast({
+        title: "Sign Up Failed!",
+        duration: 5000,
+      })
+    }
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const onSubmit = async (data: Inputs) => {
-    try {
-      console.log(data);
-      toast({
-        title: "Sign In Success!",
-        duration: 2500,
-      })
-      clearErrors(["email", "password"])
-      reset()
-      router.push('/')
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   return (
     <>
-      <Title title="Sign In / The Social" />
+      <Title title="Sign In" />
 
       <main className="min-h-screen">
         <Toaster />
@@ -104,7 +117,7 @@ const Login = () => {
                             <Button
                               type="button"
                               onClick={togglePasswordVisibility}
-                              className="absolute top-0.5 right-0.5 text-gray-500 cursor-pointer hover:bg-transparent"
+                              className="absolute top-0.5 right-0.5 text-muted-foreground cursor-pointer hover:bg-transparent"
                               variant="ghost"
                               size="sm"
 
@@ -113,7 +126,7 @@ const Login = () => {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {showPassword ? <span>Hide password</span> : <span>Show password</span>}
+                            {showPassword ? "Hide password" : "Show password"}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

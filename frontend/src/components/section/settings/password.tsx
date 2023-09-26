@@ -3,10 +3,13 @@ import { Separator } from '@/components/ui/separator'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button"
+import Title from '@/components/head'
 
 const Password = () => {
   return (
     <>
+      <Title title="Password Settings" />
+
       <h4>Password</h4>
       <small className="muted-text">This is how you can change your password.</small>
       <Separator className="my-6" />

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import Categories from './categories'
 
-const Menu: React.FC = () => {
+const Menu = () => {
   return (
     <Card className="p-3">
       <div className="flex justify-between">

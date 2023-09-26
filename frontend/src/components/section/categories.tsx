@@ -3,6 +3,10 @@ import { Toggle } from "@/components/ui/toggle"
 
 const categories = [
   {
+    value: "all",
+    label: "All",
+  },
+  {
     value: "sport",
     label: "Sport",
   },

@@ -9,12 +9,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Moon, Sun, PenSquare } from 'lucide-react'
 import ModalPost from '../../modalpost'
 import AvatarProfile from './avatarprofile'
-import LoginBtn from './loginbtn'
+import LoginBtn from './loginbtn';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store'
 
 const Navbar = () => {
   const { setTheme } = useTheme()
   const router = useRouter()
-  const [lightMode, setLightMode] = useState('light');
+  const [lightMode, setLightMode] = useState<string>('light');
+
+  const { isLogin } = useSelector((state: RootState) => state.utils);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -33,8 +37,7 @@ const Navbar = () => {
     <Card className="p-3">
       <div className="flex justify-between items-center">
         <div className="flex gap-2 justify-self-start">
-          {/* <LoginBtn /> */}
-          <AvatarProfile />
+          {isLogin ? <AvatarProfile /> : <LoginBtn />}
         </div>
         <h3 className="absolute right-1/2 translate-x-1/2 cursor-pointer" onClick={() => router.push("/")}>The Social.</h3>
         <div className="flex gap-2 justify-self-end">
@@ -44,15 +47,16 @@ const Navbar = () => {
                 <Button variant="ghost" className="px-2" onClick={toggleLightMode}>{lightMode === "dark" ? <Sun /> : <Moon />}</Button>
               </TooltipTrigger>
               <TooltipContent>
-                {lightMode === "dark" ? <span>Change to light mode</span> : <span>Change to dark mode</span>}
+                {lightMode === "dark" ? "Change to light mode" : "Change to dark mode"}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <ModalPost modalTitle="New Post" modalButton="Post">
-            <Button className="font-bold">
-              <PenSquare className="mr-2" /><span>New Post</span>
-            </Button>
-          </ModalPost>
+          {isLogin &&
+            <ModalPost modalTitle="New Post" modalButton="Post">
+              <Button className="font-bold">
+                <PenSquare className="mr-2" /><span>New Post</span>
+              </Button>
+            </ModalPost>}
         </div>
       </div>
     </Card>
