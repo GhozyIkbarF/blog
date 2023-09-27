@@ -1,12 +1,18 @@
 import React from 'react'
 import { useRouter } from 'next/router'
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Undo2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Toaster } from '../ui/toaster'
 
 const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
+  const { isLogin } = useSelector((state: RootState) => state.utils);
+
+  if (!isLogin) return <p className="text-center">You&apos;re not logged in</p>
 
   return (
     <>
@@ -46,6 +52,8 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
           </section>
         </Card>
       </section>
+
+      <Toaster />
     </>
   )
 }

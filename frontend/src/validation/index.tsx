@@ -41,8 +41,16 @@ export const LOGIN = Yup.object().shape({
 });
 
 export const EDIT_PROFILE = Yup.object().shape({
-  name: Yup.string().required("name is required"),
-  username: Yup.string().required("username is required"),
-  email: Yup.string().email("Must a valid email address").required("Email is required"),
+  name: Yup.string().required("Name is required"),
+  username: Yup.string().required("Username is required"),
+  email: Yup.string().email("Must be a valid email address").required("Email is required"),
   password: Yup.string().required('Password is required'),
+});
+
+export const EDIT_PASSWORD = Yup.object().shape({
+  oldPassword: Yup.string().required("Password is required"),
+  newPassword: Yup.string().required("Password is required"),
+  confirmPassword: Yup.string()
+    .required("Confirm Password is required")
+    .oneOf([Yup.ref("newPassword")], "Password doesn't match"),
 });

@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -74,19 +73,19 @@ const AvatarProfile = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer">
-            <AvatarImage src="https://github.com/yandaagil.png" />
-            <AvatarFallback>{userData.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
+            <AvatarImage src="" />
+            <AvatarFallback>{userData.name?.split('')[0].toLocaleUpperCase()}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/profile")}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/profile/${userData.userId}`)}>
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/profile/settings/profile")}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/settings/profile")}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
@@ -118,7 +117,7 @@ const AvatarProfile = () => {
       </DropdownMenu>
       <div className="flex flex-col">
         <h6 className="text-sm">{userData.name}</h6>
-        <h6 className="text-sm text-muted-foreground">{userData.userEmail}</h6>
+        <h6 className="text-sm text-muted-foreground">@{userData.username}</h6>
       </div>
     </>
   );

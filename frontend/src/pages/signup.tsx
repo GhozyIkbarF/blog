@@ -140,7 +140,6 @@ const SignUp = () => {
       <Title title="Sign Up" />
 
       <main className="min-h-screen">
-        <Toaster />
         <div className="w-4/5 h-full my-0 py-10 mx-auto flex flex-col items-center justify-center lg:w-11/12 2xl:w-7/12">
           <Card className="w-96 mb-5">
             <CardHeader>
@@ -256,6 +255,8 @@ const SignUp = () => {
           </Button>
         </div>
       </main>
+
+      <Toaster />
     </>
   );
 };

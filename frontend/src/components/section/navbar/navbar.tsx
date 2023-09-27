@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Moon, Sun, PenSquare } from 'lucide-react'
-import ModalPost from '../../modalpost'
+import NewPost from '../../newpost'
 import AvatarProfile from './avatarprofile'
 import LoginBtn from './loginbtn';
 import { useSelector, useDispatch } from 'react-redux';
@@ -22,9 +22,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setLightMode(savedTheme);
-    }
+    if (savedTheme) setLightMode(savedTheme);
   }, []);
 
   const toggleLightMode = () => {
@@ -51,12 +49,7 @@ const Navbar = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {isLogin &&
-            <ModalPost modalTitle="New Post" modalButton="Post">
-              <Button className="font-bold">
-                <PenSquare className="mr-2" /><span>New Post</span>
-              </Button>
-            </ModalPost>}
+          {isLogin && <NewPost />}
         </div>
       </div>
     </Card>

@@ -21,18 +21,14 @@ import { setUserData } from "@/Utlis";
 import { RootState } from "@/store";
 import axios from "axios";
 import Title from "@/components/head";
+import { useRouter } from "next/router";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Inputs {
   name: string;
   username: string;
   email: string;
   password: string;
-}
-
-interface Res {
-  name: string;
-  username: string;
-  email: string;
 }
 
 const Profile = () => {
@@ -58,6 +54,9 @@ const Profile = () => {
   });
 
   const dispatch = useDispatch()
+  const router = useRouter();
+  const { toast } = useToast();
+
   useEffect(() => {
     if (userData) {
       setValue('name', userData?.name)
@@ -72,31 +71,32 @@ const Profile = () => {
   const onSubmit = async (data: Inputs) => {
     const baseURL = process.env.NEXT_PUBLIC_API_CALL;
     try {
-      const res: Res = await axios.patch(`${baseURL}/user/edit/${userData.userId}`, data, { headers })
+      const res = await axios.patch(`${baseURL}/user/edit/${userData.userId}`, data, { headers })
       if (res) {
-        console.log(res);
         dispatch(setUserData({
-          name: res.name,
+          name: res.data.name,
           userId: userData.userId,
-          username: res.username,
-          userEmail: res.email,
+          username: res.data.username,
+          userEmail: res.data.email,
         }
         ))
         reset();
+        router.push('/profile/settings/profile')
+        toast({
+          title: "Profile updated successfully!",
+          duration: 2500,
+        })
       }
     } catch (err) {
-      setError('password', { type: 'custom', message: 'password is wrong' })
+      setError('password', { type: 'custom', message: 'Password is not correct' })
       console.error(err);
+      toast({
+        title: "Failed to update Profile",
+        duration: 2500,
+      })
     }
   }
 
-  const submitForm = () => {
-    if (myForm.current) {
-      console.log('submit');
-      // myForm.current.submit();
-      handleSubmit
-    }
-  }
   const inputData = [
     {
       label: "Name",
@@ -140,7 +140,7 @@ const Profile = () => {
         <div className="grid w-full items-center gap-5">
           {inputData.map((item, index) => (
             <div key={index} className="flex flex-col">
-              <Label htmlFor={item.id}>{item.label}</Label>
+              <Label htmlFor={item.id} className="after:content-['*'] after:text-red-500">{item.label}{" "}</Label>
               <Input
                 type={item.type}
                 id={item.id}
@@ -149,38 +149,25 @@ const Profile = () => {
                 placeholder={item.placeholder}
                 autoComplete="on"
               />
-              <small className="muted-text mt-1">{item.desc}</small>
-              {item.error && (<small className="text-red-500">{item.errorMessage}</small>)}
+              {item.error
+                ? <small className="muted-text text-red-500 mt-1">{item.errorMessage}</small>
+                : <small className="muted-text mt-1">{item.desc}</small>}
             </div>
           ))}
+          <div className="flex flex-col">
+            <Label
+              htmlFor="password"
+              className="after:content-['*'] after:text-red-500"
+            >
+              Password{" "}
+            </Label>
+            <Input type="password" id="password" {...register('password')} className="mt-2" placeholder="Enter your password" />
+            {errors.password
+              ? <small className="muted-text text-red-500 mt-1">{errors.password?.message}</small>
+              : <small className="muted-text mt-1">Enter your password to confirm changes.</small>}
+          </div>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="mt-6">Update Profile</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit profile</DialogTitle>
-              <DialogDescription>
-                Type your password below to make changes to your profile. Click
-                save when you&apos;re done.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col gap-4 py-4">
-              <Label
-                htmlFor="password"
-                className="after:content-['*'] after:text-red-500"
-              >
-                Password{" "}
-              </Label>
-              <Input type="password" id="password" {...register('password')} placeholder="Enter your password" />
-              {errors.password && <small className="text-red-500">{errors.password?.message}</small>}
-            </div>
-            <DialogFooter>
-              <Button type="submit" onClick={() => submitForm()}>Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button type="submit" className="mt-6">Update Profile</Button>
       </form>
     </>
   );

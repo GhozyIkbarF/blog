@@ -7,61 +7,43 @@ import { Eye } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
-
-interface Post {
-  author: {
-    name: string,
-    username: string;
-    email: string,
-    photo_profile: string
-  };
-  username: string;
-  authorId: number;
-  category: string;
-  content: string;
-  createdAt: string;
-  id: number;
-  image: string;
-  published: boolean;
-  title: string;
-  updatedAt: string;
-}
-
-interface Repo {
-  posts: Post[];
-};
+import { timePosted } from "@/Utlis/date";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setPosts } from "@/Utlis";
+import { RootState } from "@/store";
 
 const Post = () => {
 
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
 
-  const [data, setData] = useState<Repo | null>(null);
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState<Boolean>(true);
+  const { posts } = useSelector((state: RootState) => state.utils);
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetch(`${baseURL}/post`)
+    fetch(`${baseURL}/posts`)
       .then((res) => res.json())
-      .then((data: Repo) => {
-        setData(data);
+      .then((data) => {
+        dispatch(setPosts(data));
         setLoading(false);
       });
   }, []);
 
-  if (isLoading) return <p className="text-center">Loading...</p>;
-  if (data?.posts.length === 0) return <p className="text-center" >No post data</p>;
+  if (isLoading) return <p className="text-center mt-10">Loading...</p>;
+  if (!posts) return <p className="text-center" >No post data</p>;
 
   return (
     <Card>
-      {data?.posts.map((post, index) => (
+      {posts?.map((post: any, index: number) => (
         <React.Fragment key={index}>
           <div className="flex flex-row">
             <div className="flex flex-col">
-              <Avatar className="ml-6 mt-6">
-                <AvatarImage src={post.author.photo_profile} />
-                <AvatarFallback>{post.author.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
+              <Avatar className="ml-6 mt-6 cursor-pointer">
+                <AvatarImage src={post.author.photo_profile} onClick={() => router.push(`/profile/${post.authorId}`)} />
+                <AvatarFallback onClick={() => router.push(`/profile/${post.authorId}`)}>{post.author.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
               </Avatar>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
@@ -78,18 +60,18 @@ const Post = () => {
             </div>
             <div className="flex flex-col">
               <CardHeader className="flex flex-row space-y-0 pb-3">
-                <CardTitle className="text-sm">{post.author.username}</CardTitle>
-                <CardDescription className="ml-2">{post.author.email}</CardDescription>
-                <CardDescription className="ml-2">3 hours</CardDescription>
+                <CardTitle className="text-sm hover:underline cursor-pointer" onClick={() => router.push(`/profile/${post.authorId}`)}>{post.author.name}</CardTitle>
+                <CardDescription className="ml-2 hover:underline cursor-pointer" onClick={() => router.push(`/profile/${post.authorId}`)}>@{post.author.username}</CardDescription>
+                <CardDescription className="ml-2 hover:underline cursor-pointer" onClick={() => router.push(`/post/${post.id}`)}>{timePosted(post.createdAt)}</CardDescription>
               </CardHeader>
               <CardContent>
                 <CardTitle className="line-clamp-1">{post.title}</CardTitle>
-                {post.category && <Badge className="mt-3">{post.category}</Badge>}
+                {post.category && <Badge className="mt-3 cursor-default">{post.category.replace(/\b\w/g, l => l.toUpperCase())}</Badge>}
                 <p className="line-clamp-3">{post.content}</p>
               </CardContent>
             </div>
           </div>
-          {index !== data?.posts.length - 1 && <Separator />}
+          {index !== posts?.length - 1 && <Separator />}
         </React.Fragment>
       ))}
     </Card >

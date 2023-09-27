@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { prismaClient } from "../src/prisma-client.js";
 
-export const createUserMiddleware = async (req, res, next) => {
+export const registerMiddleware = async (req, res, next) => {
   const userSchema = Joi.object({
     name: Joi.string().required().messages({
       "string.empty": "Name cannot be empty",
