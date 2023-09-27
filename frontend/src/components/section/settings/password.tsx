@@ -59,7 +59,6 @@ const Password = () => {
         { headers }
       );
       if (res) {
-        console.log(res);
         reset();
         toast({
           title: "Password updated successfully",
@@ -67,10 +66,6 @@ const Password = () => {
         });
       }
     } catch (err) {
-      // setError("oldPassword", {
-      //   type: "custom",
-      //   message: "old password is wrong",
-      // });
       console.error(err);
       toast({
         title: "Failed to update password",

@@ -26,6 +26,7 @@ const ProfilePosts = () => {
   // const [profilePosts, setProfilePosts] = useState([])
   const [isLoading, setLoading] = useState<Boolean>(true);
   const { posts, userData } = useSelector((state: RootState) => state.utils);
+
   const { toast } = useToast();
 
   const dispatch = useDispatch();
@@ -51,7 +52,7 @@ const ProfilePosts = () => {
     const listPost = [...posts]
 
     try {
-      const res = await axios.delete(`${baseURL}/post/delete/${id}`);
+      await axios.delete(`${baseURL}/post/delete/${id}`);
       listPost.splice(index, 1)
       dispatch(setPosts(listPost))
       if (myItemRef.current) myItemRef.current.click();
@@ -69,7 +70,6 @@ const ProfilePosts = () => {
   }
 
   if (isLoading) return <p className="text-center mt-10">Loading...</p>;
-  if (!posts) return <p className="text-center" >No post data</p>;
 
   return (
     <article className="flex flex-col">
