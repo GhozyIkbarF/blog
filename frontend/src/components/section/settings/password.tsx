@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import Title from "@/components/head";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import axios from "axios";
 import { EDIT_PASSWORD } from "@/validation";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Eye, EyeOff } from "lucide-react";
 
 interface Inputs {
   oldPassword: string;
@@ -18,7 +21,9 @@ interface Inputs {
 }
 
 const Password = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const { userData } = useSelector((state: RootState) => state.utils);
+
   const {
     register,
     handleSubmit,
@@ -35,6 +40,10 @@ const Password = () => {
       confirmPassword: "",
     },
   });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const { toast } = useToast();
 
@@ -53,7 +62,7 @@ const Password = () => {
         console.log(res);
         reset();
         toast({
-          title: "Password is updated successfully",
+          title: "Password updated successfully",
           duration: 2500,
         });
       }
@@ -64,7 +73,7 @@ const Password = () => {
       // });
       console.error(err);
       toast({
-        title: "Password is wrong",
+        title: "Failed to update password",
         duration: 2500,
       });
     }
@@ -73,7 +82,6 @@ const Password = () => {
   const inputData = [
     {
       label: "Old Password",
-      htmlFor: "NewPassword",
       id: "oldPassword",
       placeholder: "Enter your old password",
       error: errors.oldPassword,
@@ -81,7 +89,6 @@ const Password = () => {
     },
     {
       label: "New Password",
-      htmlFor: "OldPassword",
       id: "newPassword",
       placeholder: "Enter your new password",
       error: errors.newPassword,
@@ -89,7 +96,6 @@ const Password = () => {
     },
     {
       label: "Confirm password",
-      htmlFor: "ConfirmPassword",
       id: "confirmPassword",
       placeholder: "Password confirmation",
       error: errors.confirmPassword,
@@ -99,6 +105,8 @@ const Password = () => {
 
   return (
     <>
+      <Title title="Password Settings" />
+
       <h4>Password</h4>
       <small className="muted-text">
         This is how others will see you on the site.
@@ -109,23 +117,42 @@ const Password = () => {
           {inputData.map((item, index) => (
             <div key={index}>
               <Label
-                htmlFor={item.htmlFor}
+                htmlFor={item.id}
                 className="after:content-['*'] after:text-red-500"
               >
                 {item.label}
               </Label>
-              <Input
-                type="password"
-                id={item.id}
-                {...register(
-                  item.id as "oldPassword" | "newPassword" | "confirmPassword"
-                )}
-                className="mt-2"
-                placeholder={item.placeholder}
-              />
-              {item.error && (
-                <small className="text-red-500">{item.errorMessage}</small>
-              )}
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  id={item.id}
+                  {...register(
+                    item.id as "oldPassword" | "newPassword" | "confirmPassword"
+                  )}
+                  className="mt-2"
+                  placeholder={item.placeholder}
+                />
+                <TooltipProvider>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        onClick={togglePasswordVisibility}
+                        className="absolute top-0.5 right-0.5 text-muted-foreground cursor-pointer hover:bg-transparent"
+                        variant="ghost"
+                        size="sm"
+
+                      >
+                        {showPassword ? <EyeOff /> : <Eye />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {showPassword ? "Hide password" : "Show password"}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              {item.error && <small className="muted-text text-red-500 mt-1">{item.errorMessage}</small>}
             </div>
           ))}
         </div>

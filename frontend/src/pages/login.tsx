@@ -20,7 +20,7 @@ interface Inputs {
 }
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState<Boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const {
@@ -41,21 +41,21 @@ const Login = () => {
   const headers = {
     'Content-Type': 'application/json'
   }
-  
+
   const { toast } = useToast();
   const onSubmit = async (data: Inputs) => {
     try {
       const res = await axios.post(`${baseURL}/login`, data, {
-        headers, 
+        headers,
         withCredentials: true,
       });
       toast({
-        title: "Sign Up Success!",
+        title: "Login Success!",
         duration: 2500,
       })
       reset();
       console.log(res);
-      clearErrors(["email", "password" ]);
+      clearErrors(["email", "password"]);
       router.push('/')
     } catch (err) {
       console.log(err)
@@ -72,10 +72,9 @@ const Login = () => {
 
   return (
     <>
-      <Title title="Sign In / The Social" />
+      <Title title="Sign In" />
 
       <main className="min-h-screen">
-        <Toaster />
         <div className="w-4/5 h-full my-0 py-10 mx-auto flex flex-col items-center justify-center lg:w-11/12 2xl:w-7/12">
           <Card className="w-96 mb-5">
             <CardHeader>
@@ -117,7 +116,7 @@ const Login = () => {
                             <Button
                               type="button"
                               onClick={togglePasswordVisibility}
-                              className="absolute top-0.5 right-0.5 text-gray-500 cursor-pointer hover:bg-transparent"
+                              className="absolute top-0.5 right-0.5 text-muted-foreground cursor-pointer hover:bg-transparent"
                               variant="ghost"
                               size="sm"
 
@@ -126,7 +125,7 @@ const Login = () => {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {showPassword ? <span>Hide password</span> : <span>Show password</span>}
+                            {showPassword ? "Hide password" : "Show password"}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -142,6 +141,8 @@ const Login = () => {
           </Card>
         </div>
       </main>
+
+      <Toaster />
     </>
   )
 }

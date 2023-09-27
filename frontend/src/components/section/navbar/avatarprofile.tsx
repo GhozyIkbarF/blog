@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -32,7 +31,7 @@ import { setIsLogin, setUserData } from "@/Utlis";
 
 const AvatarProfile = () => {
   const myItemRef = useRef<HTMLButtonElement | null>(null);
-  const { userData }  =  useSelector((state: RootState) => state.utils);
+  const { userData } = useSelector((state: RootState) => state.utils);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -45,25 +44,25 @@ const AvatarProfile = () => {
         withCredentials: true,
       });
       toast({
-        title: "Logout is Success!",
+        title: "Logout Success!",
         duration: 2500,
       });
-      if (res){
-        if(myItemRef.current) myItemRef.current.click();
+      if (res) {
+        if (myItemRef.current) myItemRef.current.click();
         router.push("/");
         dispatch(setIsLogin(false));
         dispatch(setUserData({
-          name: "",          
+          name: "",
           userEmail: "",
           userId: 0,
           username: "",
           // photoProfile: "",
         }))
-      } 
+      }
     } catch (err) {
       console.error(err);
       toast({
-        title: "Logout is Failed!",
+        title: "Logout Failed!",
         duration: 2500,
       });
     }
@@ -74,7 +73,7 @@ const AvatarProfile = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer">
-            <AvatarImage src="https://github.com/yandaagil.png" />
+            <AvatarImage src="" />
             <AvatarFallback>{userData.name?.split('')[0].toLocaleUpperCase()}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
@@ -82,27 +81,19 @@ const AvatarProfile = () => {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <Link href="/profile">
-              <DropdownMenuItem className="cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-            </Link>
-            <Link href="/profile/settings/profile">
-              <DropdownMenuItem className="cursor-pointer">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/profile/${userData.userId}`)}>
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/settings/profile")}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                className="w-full justify-start text-red-500 hover:text-red-500"
-                variant="ghost"
-                size="sm"
-              >
+            <AlertDialogTrigger asChild className="px-2 py-1.5">
+              <Button className="w-full justify-start text-red-500 hover:text-red-500" variant="ghost" size="sm">
                 <LogOut className="mr-2 h-4 w-4 text-red-500" /> Log Out
               </Button>
             </AlertDialogTrigger>
@@ -126,7 +117,7 @@ const AvatarProfile = () => {
       </DropdownMenu>
       <div className="flex flex-col">
         <h6 className="text-sm">{userData.name}</h6>
-        <h6 className="text-sm text-muted-foreground">{userData.userEmail}</h6>
+        <h6 className="text-sm text-muted-foreground">@{userData.username}</h6>
       </div>
     </>
   );

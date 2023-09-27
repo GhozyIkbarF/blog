@@ -5,7 +5,16 @@ const timePosted = (inputDate: string): string => {
   const inputDateTime = new Date(inputDate);
   const timeDifference = currentDate.getTime() - inputDateTime.getTime();
 
-  if (timeDifference >= 86400000) {
+  if (timeDifference >= 31556952000) {
+    const days = Math.floor(timeDifference / 31556952000);
+    return `${days}y`;
+  } else if (timeDifference >= 2629746000) {
+    const days = Math.floor(timeDifference / 2629746000);
+    return `${days}mon`;
+  } else if (timeDifference >= 604800000) {
+    const days = Math.floor(timeDifference / 604800000);
+    return `${days}w`;
+  } else if (timeDifference >= 86400000) {
     const days = Math.floor(timeDifference / 86400000);
     return `${days}d`;
   } else if (timeDifference >= 3600000) {
@@ -18,14 +27,15 @@ const timePosted = (inputDate: string): string => {
     const seconds = Math.floor(timeDifference / 1000);
     return `${seconds}s`;
   } else {
-    return "Now";
+    return "Just now";
   }
 };
 
 const createdAt = (inputDate: string | undefined) => {
   if (inputDate) {
-    const parsedDate = date.parse(inputDate, "YYYY-MM-DD HH:mm:ss.SSS");
-    const formattedDate = date.format(parsedDate, "h:mm A · MMM DD, YYYY");
+    const parsedDate = date.parse(inputDate.replace('T', ' ').replace('Z', ''), "YYYY-MM-DD hh:mm:ss.SSS", true);
+    const formattedDate = date.format(parsedDate, "· h:mm A · MMM DD, YYYY");
+
     return formattedDate;
   }
 };

@@ -25,8 +25,8 @@ interface Inputs {
 }
 
 const SignUp = () => {
-  const [showPassword, setShowPassword] = useState<Boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<Boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
 
@@ -52,13 +52,13 @@ const SignUp = () => {
   const headers = {
     'Content-Type': 'application/json'
   }
-  
+
   const { toast } = useToast();
   const onSubmit = async (data: Inputs) => {
     console.log(data);
-    
+
     try {
-      const res = await axios.post(`${baseURL}/register`, data, {headers});
+      const res = await axios.post(`${baseURL}/register`, data, { headers });
       toast({
         title: "Sign Up Success!",
         duration: 2500,
@@ -137,9 +137,9 @@ const SignUp = () => {
 
   return (
     <>
-      <Title title="Sign Up / The Social" />
+      <Title title="Sign Up" />
+
       <main className="min-h-screen">
-        <Toaster />
         <div className="w-4/5 h-full my-0 py-10 mx-auto flex flex-col items-center justify-center lg:w-11/12 2xl:w-7/12">
           <Card className="w-96 mb-5">
             <CardHeader>
@@ -168,6 +168,7 @@ const SignUp = () => {
                           )}
                           id={item.id}
                           placeholder={item.placeholder}
+                          autoComplete="on"
                         />
                       ) : (
                         <div className="relative">
@@ -203,7 +204,7 @@ const SignUp = () => {
                                       ? togglePasswordVisibility
                                       : toggleConfirmPasswordVisibility
                                   }
-                                  className="absolute top-0.5 right-0.5 text-gray-500 cursor-pointer hover:bg-transparent"
+                                  className="absolute top-0.5 right-0.5 text-muted-foreground cursor-pointer hover:bg-transparent"
                                   variant="ghost"
                                   size="sm"
                                 >
@@ -223,23 +224,21 @@ const SignUp = () => {
                               <TooltipContent>
                                 {item.id === "password" ? (
                                   showPassword ? (
-                                    <span>Hide password</span>
+                                    "Hide password"
                                   ) : (
-                                    <span>Show password</span>
+                                    "Show password"
                                   )
                                 ) : showConfirmPassword ? (
-                                  <span>Hide password</span>
+                                  "Hide password"
                                 ) : (
-                                  <span>Show password</span>
+                                  "Show password"
                                 )}
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         </div>
                       )}
-                      {item.error && (
-                        <small className="text-red-500">{item.errorMessage}</small>
-                      )}
+                      {item.error && <small className="text-red-500">{item.errorMessage}</small>}
                     </div>
                   ))}
                 </div>
@@ -256,6 +255,8 @@ const SignUp = () => {
           </Button>
         </div>
       </main>
+
+      <Toaster />
     </>
   );
 };
