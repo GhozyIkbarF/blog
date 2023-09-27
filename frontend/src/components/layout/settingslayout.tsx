@@ -38,10 +38,10 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
               <aside className="w-[25%]">
                 <ul className="list-none">
                   <li>
-                    <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/profile/settings/profile")}>Profile</Button>
+                    <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/settings/profile")}>Profile</Button>
                   </li>
                   <li>
-                    <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/profile/settings/password")}>Password</Button>
+                    <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/settings/password")}>Password</Button>
                   </li>
                 </ul>
               </aside>

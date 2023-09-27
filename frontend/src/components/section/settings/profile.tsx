@@ -81,7 +81,7 @@ const Profile = () => {
         }
         ))
         reset();
-        router.push('/profile/settings/profile')
+        router.push('/settings/profile')
         toast({
           title: "Profile updated successfully!",
           duration: 2500,
@@ -89,7 +89,6 @@ const Profile = () => {
       }
     } catch (err) {
       setError('password', { type: 'custom', message: 'Password is not correct' })
-      console.error(err);
       toast({
         title: "Failed to update Profile",
         duration: 2500,
