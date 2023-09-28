@@ -26,7 +26,7 @@ export const CREATE_USER = Yup.object().shape({
   photo_profile: Yup.string().nullable(),
   password: Yup.string()
     .max(50, "Maximum password 50 characters")
-    .min(5, "Minimum password 5 characters")
+    .min(6, "Minimum password 6 characters")
     .required("Password is required"),
   confirmPassword: Yup.string()
     .required("Confirm Password is required")
@@ -41,9 +41,9 @@ export const LOGIN = Yup.object().shape({
 });
 
 export const EDIT_PROFILE = Yup.object().shape({
-  name: Yup.string().required("name is required"),
-  username: Yup.string().required("username is required"),
-  email: Yup.string().email("Must a valid email address").required("Email is required"),
+  name: Yup.string().required("Name is required"),
+  username: Yup.string().required("Username is required"),
+  email: Yup.string().email("Must be a valid email address").required("Email is required"),
   password: Yup.string().required('Password is required'),
 });
 

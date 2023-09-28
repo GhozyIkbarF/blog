@@ -27,6 +27,7 @@ interface StateSlice {
   isLogin: boolean;
   accessToken: string;
   posts: Post[];
+  editPost: []
 }
 
 const initialState: StateSlice = {
@@ -34,6 +35,7 @@ const initialState: StateSlice = {
   isLogin: false,
   accessToken: "",
   posts: [],
+  editPost: [],
 };
 
 const stateSlice = createSlice({
@@ -51,10 +53,13 @@ const stateSlice = createSlice({
     },
     setPosts: (state, action) => {
       state.posts = action.payload;
+    },
+    setEditPost: (state, action) => {
+      state.editPost = action.payload;
     }
   },
 });
 
-export const { setUserData, setIsLogin, setPosts } = stateSlice.actions;
+export const { setUserData, setIsLogin, setPosts, setEditPost } = stateSlice.actions;
 
 export default stateSlice.reducer;

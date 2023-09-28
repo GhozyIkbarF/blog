@@ -1,17 +1,18 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Undo2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Toaster } from '../ui/toaster'
 
-type LayoutProps = {
-  children: React.ReactNode,
-};
-
-const SettingsLayout = ({ children }: LayoutProps) => {
+const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
+  const { isLogin } = useSelector((state: RootState) => state.utils);
+
+  if (!isLogin) return <p className="text-center">You&apos;re not logged in</p>
 
   return (
     <>
@@ -22,7 +23,7 @@ const SettingsLayout = ({ children }: LayoutProps) => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Button className="rounded-full" size="icon" variant="ghost" onClick={() => router.push('/')}>
+                    <Button className="rounded-full" size="icon" variant="ghost" onClick={() => router.back()}>
                       <Undo2 />
                     </Button>
                   </TooltipTrigger>
@@ -37,14 +38,10 @@ const SettingsLayout = ({ children }: LayoutProps) => {
               <aside className="w-[25%]">
                 <ul className="list-none">
                   <li>
-                    <Link href="/profile/settings/profile">
-                      <Button className="w-full justify-start" variant="outline">Profile</Button>
-                    </Link>
+                    <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/settings/profile")}>Profile</Button>
                   </li>
                   <li>
-                    <Link href="/profile/settings/password">
-                      <Button className="w-full justify-start" variant="outline">Password</Button>
-                    </Link>
+                    <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/settings/password")}>Password</Button>
                   </li>
                 </ul>
               </aside>
@@ -55,6 +52,8 @@ const SettingsLayout = ({ children }: LayoutProps) => {
           </section>
         </Card>
       </section>
+
+      <Toaster />
     </>
   )
 }

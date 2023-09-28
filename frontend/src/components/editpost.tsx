@@ -38,6 +38,7 @@ import {
   Check,
   Lock,
   PenSquare,
+  Pencil,
 } from "lucide-react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
@@ -53,7 +54,13 @@ interface Categories {
   label: string;
 }
 
-const categories: Array<Categories> = [
+type modalProps = {
+  modalTitle: string;
+  modalButton: string;
+  children: React.ReactNode;
+}
+
+const categories: Categories[] = [
   {
     value: "sport",
     label: "Sport",
@@ -81,17 +88,17 @@ interface Inputs {
   content: string;
   published: boolean;
   category: string;
-  file: FileList;
+  file: FileList | string;
 }
 
-const NewPost = () => {
+const EditPost = ({ index, className }: { index?: number, className?: string }) => {
   const [open, setOpen] = useState(false);
   const { userData, posts } = useSelector((state: RootState) => state.utils);
 
-  const btnClose: HTMLElement | null = document.getElementById('btn-close-dialog');
+  // const btnClose: HTMLElement | null = document.getElementById('btn-close-dialog');
 
   const dispatch = useDispatch();
-  
+
   const {
     register,
     handleSubmit,
@@ -112,12 +119,12 @@ const NewPost = () => {
   });
 
   const category = watch("category");
-  const publised = watch("published");
+  const published = watch("published");
   const file = watch("file");
 
   const { toast } = useToast();
 
-  useEffect(() => {}, [file]);
+  useEffect(() => { }, [file]);
 
   const headers = {
     "Content-Type": "multipart/form-data",
@@ -138,7 +145,7 @@ const NewPost = () => {
     const baseURL = process.env.NEXT_PUBLIC_API_CALL;
     try {
       const postData = convertToFormData(data);
-      const res = await axios.post(`${baseURL}/post`, postData, { headers });
+      const res = await axios.patch(`${baseURL}/post`, postData, { headers });
       console.log(res);
       dispatch(setPosts([res.data, ...posts]))
       reset();
@@ -146,7 +153,7 @@ const NewPost = () => {
         title: "Create new post is success!",
         duration: 2500,
       });
-      btnClose?.click();
+      // btnClose?.click();
     } catch (err) {
       console.error(err);
       toast({
@@ -163,25 +170,35 @@ const NewPost = () => {
     setValue("category", value);
     setOpen(false);
   };
+
   const handlePublicPost = () => {
-    setValue("published", !publised);
+    setValue("published", !published);
   };
 
   const submitForm = async () => {
     handleSubmit(onSubmit);
   };
+
+  const handleEditPost = () => {
+    const post = posts[index!];
+    setValue("title", post.title);
+    setValue("content", post.content);
+    setValue("category", post.category);
+    setValue("published", post.published);
+    setValue("file", post.image);
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" className="font-bold">
-          <PenSquare className="mr-2" />
-          <span>New Post</span>
+        <Button  type="button" className={`ml-6 mt-3 rounded-full ${className}`} size="icon" variant="ghost" onClick={handleEditPost}>
+          <Pencil />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>New Post</DialogTitle>
+            <DialogTitle>Edit Post</DialogTitle>
             <DialogDescription>What&apos;s on your mind?</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -199,6 +216,7 @@ const NewPost = () => {
               <Textarea
                 className="min-h-[200px]"
                 {...register("content")}
+                id="content"
                 placeholder="Write your mind here"
               />
             </div>
@@ -208,36 +226,17 @@ const NewPost = () => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Label htmlFor={"file"}>
-                      <Img />
-                      <Input
-                        {...register("file")}
-                        type="file"
-                        id="file"
-                        className="hidden"
-                        accept="image/*"
-                      />
-                    </Label>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add an image</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
                     <Button
                       type="button"
                       variant="outline"
                       size="icon"
                       onClick={() => handlePublicPost()}
                     >
-                      {publised ? <Globe /> : <Lock />}
+                      {published ? <Globe /> : <Lock />}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {publised ? (
+                    {published ? (
                       <p>Everybody can see your post</p>
                     ) : (
                       <p>Only you can see your post</p>
@@ -256,7 +255,7 @@ const NewPost = () => {
                   >
                     {category
                       ? categories.find((item) => item.value === category)
-                          ?.label
+                        ?.label
                       : "Select category..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -289,15 +288,33 @@ const NewPost = () => {
                   </Command>
                 </PopoverContent>
               </Popover>
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Label htmlFor={"file"}>
+                      <Input
+                        {...register("file")}
+                        type="file"
+                        id="file"
+                        className="cursor-pointer"
+                        accept="image/*"
+                      />
+                    </Label>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add an image</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             <Button type="submit" onClick={() => submitForm}>
-              Post
+              Update
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   );
 };
 
-export default NewPost;
+export default EditPost;

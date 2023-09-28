@@ -3,6 +3,10 @@ import { Toggle } from "@/components/ui/toggle"
 
 const categories = [
   {
+    value: "all",
+    label: "All",
+  },
+  {
     value: "sport",
     label: "Sport",
   },
@@ -24,11 +28,7 @@ const categories = [
   },
 ]
 
-interface CategoriesProps {
-  className?: string;
-}
-
-const Categories: React.FC<CategoriesProps> = ({ className }) => {
+const Categories = ({ className }: { className?: string }) => {
   return (
     <div className={`flex gap-2 ${className}`}>
       {categories.map((category, index) => (
