@@ -26,6 +26,8 @@ import EditPost from "@/components/editpost";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useToast } from "@/components/ui/use-toast"
+import Image from "next/image";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 interface DetailedPost {
   author: {
@@ -40,7 +42,7 @@ interface DetailedPost {
   content: string;
   createdAt: string;
   id: number;
-  image: string;
+  image: string | StaticImport;
   published: boolean;
   title: string;
   updatedAt: string;
@@ -157,6 +159,9 @@ const DetailedPost = () => {
               <CardContent>
                 <Badge className="mb-3 cursor-default">{detailPost?.category.replace(/\b\w/g, l => l.toUpperCase())}</Badge>
                 <h2 className="mb-3">{detailPost?.title}</h2>
+                <div className="relative h-96">
+                  <Image src={detailPost?.image.replace(/\\/g, "/")} className="object-contain" fill={true} alt="image" priority={true} />
+                </div>
                 <p>{detailPost?.content}</p>
               </CardContent>
             </article>
