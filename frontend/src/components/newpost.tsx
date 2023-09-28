@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Globe, ChevronsUpDown, Check, Lock, PenSquare } from "lucide-react";
+import { Globe, ChevronsUpDown, Check, Lock, PenSquare, Image as ImageIcon } from "lucide-react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -58,18 +58,18 @@ interface Inputs {
   content: string;
   published: boolean;
   category: string;
-  file: FileList;
+  file: FileList | string;
 }
 
 const NewPost = () => {
-  const [open, setOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("")
-  const { userData, posts } = useSelector((state: RootState) => state.utils);
-
-  // const btnClose: HTMLElement | null = document.getElementById('btn-close-dialog');
-
   const dispatch = useDispatch();
   const router = useRouter();
+  const maxCharLength = 2500;
+  const [open, setOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("")
+  const [text, setText] = useState("");
+  const { userData, posts } = useSelector((state: RootState) => state.utils);
+  const btnClose: HTMLElement | null = document.getElementById('btn-close-dialog');
 
   const {
     register,
@@ -120,11 +120,14 @@ const NewPost = () => {
       const res = await axios.post(`${baseURL}/post`, postData, { headers });
       dispatch(setPosts([res.data, ...posts]))
       reset();
+      setText("")
+      setPreviewImage("")
+      setValue("file", "")
       toast({
         title: "Create new post is success!",
         duration: 2500,
       });
-      // btnClose?.click();
+      btnClose?.click();
     } catch (err) {
       console.error(err);
       toast({
@@ -134,9 +137,6 @@ const NewPost = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if(!open) reset();
-  // },[open])
   const handleSelectedCategory = (value: string) => {
     setValue("category", value);
     setOpen(false);
@@ -153,6 +153,19 @@ const NewPost = () => {
   const getPreviewImage = (event: ChangeEvent<HTMLInputElement>) => {
     setPreviewImage(URL.createObjectURL(event.target.files?.[0]))
   }
+
+  const deletePreviewImage = () => {
+    setPreviewImage("")
+    setValue("file", "")
+  }
+
+  const handleText = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setText(event.target.value);
+  };
+
+  const countCharacters = (inputText: string) => {
+    return inputText.length;
+  };
 
   return (
     <Dialog>
@@ -179,15 +192,36 @@ const NewPost = () => {
               />
             </div>
             <div className="flex flex-col space-y-3">
-              <Label htmlFor="content">Paragraph</Label>
+              <div className="flex flex-row justify-between">
+                <Label htmlFor="content">Paragraph</Label>
+                {countCharacters(text) < 2500
+                  ? <small className="muted-text">{countCharacters(text)} / {maxCharLength}</small>
+                  : <small className="muted-text text-red-500">{countCharacters(text)} / {maxCharLength}</small>}
+              </div>
               <Textarea
                 className="min-h-[200px]"
                 {...register("content")}
                 id="content"
+                maxLength={2500}
+                value={text}
+                onChange={handleText}
                 placeholder="Write your mind here"
               />
             </div>
-            {previewImage !== "" && <Image src={previewImage} alt="Preview image" height={150} width={150} />}
+            <div className="flex flex-col space-y-3">
+              <Label htmlFor={"file"} className="flex flex-col gap-1 items-center justify-center cursor-pointer h-28 w-full text-muted-foreground rounded-md border-2 border-input border-dashed bg-background px-3 py-2 transition-colors hover:border-muted-foreground">
+                {previewImage !== ""
+                  ? <div className="relative h-full w-full">
+                    <Image src={previewImage} className="object-contain" alt="Preview image" fill={true} />
+                  </div>
+                  : <>
+                    <ImageIcon />
+                    Add an image
+                  </>
+                }
+              </Label>
+              {previewImage !== "" && <Button type="button" variant="destructive" onClick={deletePreviewImage}>Delete Image</Button>}
+            </div>
           </div>
           <DialogFooter className="flex-col sm:justify-between">
             <div className="flex justify-start gap-2">
@@ -259,7 +293,7 @@ const NewPost = () => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Label htmlFor={"file"}>
+                    <div>
                       <Input
                         {...register("file")}
                         type="file"
@@ -268,10 +302,10 @@ const NewPost = () => {
                         accept="image/*"
                         onChange={getPreviewImage}
                       />
-                    </Label>
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Add an image</p>
+                    Add an image
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
