@@ -48,7 +48,7 @@ const Profile = () => {
       <section>
         <Card>
           <section className="flex flex-col">
-            <div className="flex flex-row ml-6 mt-3 items-center">
+            <div className="flex flex-row ml-3 mt-3 items-center sm:ml-6">
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -64,15 +64,15 @@ const Profile = () => {
               <h3 className="ml-3">Profile</h3>
             </div>
             <div className="flex justify-center">
-              <CardHeader className="flex flex-row space-y-0 pb-0">
-                <Avatar className="w-32 h-32">
+              <CardHeader className="flex flex-row space-y-0 px-3 pt-3 pb-0 sm:px-6 sm:pt-6">
+                <Avatar className="w-28 h-28 sm:w-32 sm:h-32">
                   <AvatarImage src="" />
-                  <AvatarFallback className="text-5xl">{detailProfile?.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
+                  <AvatarFallback className="text-3xl sm:text-5xl">{detailProfile?.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
                 </Avatar>
-                <div className="ml-6 flex flex-col justify-between">
+                <div className="ml-3 flex flex-col justify-between sm:ml-6">
                   <div className="flex flex-col">
-                    <CardTitle className="text-4xl line-clamp-1">{detailProfile?.name}</CardTitle>
-                    <CardDescription className="[&:not(:first-child)]:mt-0 text-lg">@{detailProfile?.username}</CardDescription>
+                    <CardTitle className="text-xl line-clamp-1 sm:text-4xl">{detailProfile?.name}</CardTitle>
+                    <CardDescription className="[&:not(:first-child)]:mt-0 text-base sm:text-lg">@{detailProfile?.username}</CardDescription>
                   </div>
                   {id === userData?.userId &&
                     <div>
@@ -82,7 +82,7 @@ const Profile = () => {
                 </div>
               </CardHeader>
             </div>
-            <Categories className="p-6 justify-center" />
+            <Categories className="p-6 sm:justify-center" />
             <ProfilePosts />
           </section>
         </Card>

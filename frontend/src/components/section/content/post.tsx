@@ -30,7 +30,7 @@ const Post = () => {
         dispatch(setPosts(data));
         setLoading(false);
       });
-  }, []);
+  }, [baseURL, dispatch]);
 
   if (isLoading) return <p className="text-center mt-10">Loading...</p>;
   if (!posts) return <p className="text-center" >No post data</p>;
@@ -41,14 +41,14 @@ const Post = () => {
         <React.Fragment key={index}>
           <div className="flex flex-row">
             <div className="flex flex-col">
-              <Avatar className="ml-6 mt-6 cursor-pointer">
+              <Avatar className="ml-3 mt-3 cursor-pointer sm:ml-6 sm:mt-6">
                 <AvatarImage src={post.author.photo_profile} onClick={() => router.push(`/profile/${post.authorId}`)} />
                 <AvatarFallback onClick={() => router.push(`/profile/${post.authorId}`)}>{post.author.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
               </Avatar>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Button className="ml-6 mt-3 rounded-full" size="icon" variant="outline" onClick={() => router.push(`/post/${post.id}`)}>
+                    <Button className="ml-3 mt-3 rounded-full sm:ml-6" size="icon" variant="outline" onClick={() => router.push(`/post/${post.id}`)}>
                       <Eye />
                     </Button>
                   </TooltipTrigger>
@@ -59,13 +59,13 @@ const Post = () => {
               </TooltipProvider>
             </div>
             <div className="flex flex-col">
-              <CardHeader className="flex flex-row space-y-0 pb-3">
+              <CardHeader className="p-3 flex flex-row space-y-0 pb-3 sm:px-6 sm:pt-6">
                 <CardTitle className="text-sm hover:underline cursor-pointer" onClick={() => router.push(`/profile/${post.authorId}`)}>{post.author.name}</CardTitle>
                 <CardDescription className="ml-2 hover:underline cursor-pointer" onClick={() => router.push(`/profile/${post.authorId}`)}>@{post.author.username}</CardDescription>
                 <CardDescription className="ml-2 hover:underline cursor-pointer" onClick={() => router.push(`/post/${post.id}`)}>{timePosted(post.createdAt)}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <CardTitle className="line-clamp-1">{post.title}</CardTitle>
+              <CardContent className="px-3 pb-3 sm:pt-0 sm:pb-6">
+                <CardTitle className="line-clamp-1 hover:underline cursor-pointer" onClick={() => router.push(`/post/${post.id}`)}>{post.title}</CardTitle>
                 {post.category && <Badge className="mt-3 cursor-default">{post.category.replace(/\b\w/g, l => l.toUpperCase())}</Badge>}
                 <p className="line-clamp-3">{post.content}</p>
               </CardContent>

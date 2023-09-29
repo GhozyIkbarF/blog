@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import Title from "@/components/head";
 import { Button } from "@/components/ui/button";
 import {
@@ -98,7 +97,7 @@ const DetailedPost = () => {
       <section>
         <Card>
           <section className="flex flex-col">
-            <div className="flex flex-row ml-6 mt-3 items-center">
+            <div className="flex flex-row ml-3 mt-3 items-center sm:ml-6">
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -113,7 +112,7 @@ const DetailedPost = () => {
               </TooltipProvider>
               <h3 className="ml-3">Post</h3>
             </div>
-            <CardHeader className="flex flex-row space-y-0 pb-6 justify-between">
+            <CardHeader className="flex flex-row space-y-0 p-3 justify-between sm:p-6">
               <div className="flex flex-row">
                 <Avatar className="w-12 h-12 cursor-pointer">
                   <AvatarImage src={detailPost?.author.photo_profile} onClick={() => router.push(`/profile/${detailPost?.authorId}`)} />
@@ -148,7 +147,7 @@ const DetailedPost = () => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel ref={myItemRef}>Cancel</AlertDialogCancel>
-                        <Button variant="destructive" onClick={() => deletePost(detailPost?.id)}>Delete</Button>
+                        <Button variant="destructive" className="w-1/2 sm:w-auto" onClick={() => deletePost(detailPost?.id)}>Delete</Button>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
@@ -160,12 +159,12 @@ const DetailedPost = () => {
                 <Badge className="mb-3 cursor-default">{detailPost?.category.replace(/\b\w/g, l => l.toUpperCase())}</Badge>
                 <h2 className="mb-3">{detailPost?.title}</h2>
                 <div className="relative h-96">
-                  <Image src={detailPost?.image.replace(/\\/g, "/")} className="object-contain" fill={true} alt="image" priority={true} />
+                  <Image src={(detailPost?.image as string)?.replace(/\\/g, "/")} className="object-contain" fill={true} alt="image" priority={true} />
                 </div>
                 <p>{detailPost?.content}</p>
               </CardContent>
             </article>
-            <footer className="m-0 px-6 pb-6 flex flex-row items-center">
+            <footer className="m-0 px-3 pb-3 flex flex-row items-center sm:px-6 sm:pb-6">
               {detailPost?.published
                 ? <Globe className="w-[18px] h-[18px] mr-1 text-muted-foreground" />
                 : <Lock className="w-[18px] h-[18px] mr-1 text-muted-foreground" />
