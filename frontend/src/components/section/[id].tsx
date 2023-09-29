@@ -25,16 +25,19 @@ const ProfilePosts = () => {
 
   // const [profilePosts, setProfilePosts] = useState([])
   const [isLoading, setLoading] = useState<Boolean>(true);
-  const { posts, userData } = useSelector((state: RootState) => state.utils);
+  const { posts, userData, accessToken } = useSelector((state: RootState) => state.utils);
 
   const { toast } = useToast();
 
   const dispatch = useDispatch();
+  const headers = {
+    'authorization': `Bearer ${accessToken}`,
+  }
 
   const getProfilePosts = async () => {
     setLoading(true)
     try {
-      const res = await axios.get(`${baseURL}/profileposts/${id}`);
+      const res = await axios.get(`${baseURL}/profileposts/${id}`, {headers});
       dispatch(setPosts(res.data))
     } catch (err) {
       console.log(err)
@@ -97,7 +100,7 @@ const ProfilePosts = () => {
               </TooltipProvider>
               {id === userData?.userId &&
                 <>
-                  <EditPost index={index} />
+                  <EditPost id={post.id} index={index} />
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button className="ml-6 mt-3 mb-6 rounded-full" size="icon" variant="ghost">

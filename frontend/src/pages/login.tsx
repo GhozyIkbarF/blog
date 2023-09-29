@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Title from '@/components/head'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,6 +13,8 @@ import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LOGIN } from '@/validation'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
+import { RootState } from "@/store";
 
 interface Inputs {
   email: string;
@@ -21,6 +23,7 @@ interface Inputs {
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const { isLogin } = useSelector((state: RootState) => state.utils);
   const router = useRouter();
 
   const {
@@ -65,6 +68,13 @@ const Login = () => {
       })
     }
   };
+
+  useEffect(() => {
+    console.log(isLogin);
+    if (isLogin) {
+      router.push('/')
+    }
+  },[])
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

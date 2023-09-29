@@ -60,6 +60,6 @@ const stateSlice = createSlice({
   },
 });
 
-export const { setUserData, setIsLogin, setPosts, setEditPost } = stateSlice.actions;
+export const { setUserData, setIsLogin, setAccessToken, setPosts, setEditPost } = stateSlice.actions;
 
 export default stateSlice.reducer;
