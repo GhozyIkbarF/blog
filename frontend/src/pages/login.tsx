@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Link from 'next/link'
 import Title from '@/components/head'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -139,6 +140,9 @@ const Login = () => {
               </CardFooter>
             </form>
           </Card>
+          <Button asChild className="w-96" variant="ghost">
+            <Link href="/signup">Sign Up</Link>
+          </Button>
         </div>
       </main>
 

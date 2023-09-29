@@ -67,19 +67,19 @@
   }
 
   h2 {
-    @apply scroll-m-20 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+    @apply scroll-m-20 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl;
   }
 
   h3 {
-    @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+    @apply scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl;
   }
 
   h4 {
-    @apply scroll-m-20 text-xl font-semibold tracking-tight;
+    @apply scroll-m-20 text-lg font-semibold tracking-tight sm:text-xl;
   }
 
   p {
-    @apply leading-7 [&:not(:first-child)]:mt-3;
+    @apply leading-5 [&:not(:first-child)]:mt-3 text-sm sm:text-base sm:leading-7;
   }
 
   blockquote {

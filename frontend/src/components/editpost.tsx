@@ -182,7 +182,7 @@ const EditPost = ({ className }: { className?: string }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className={`ml-6 mt-3 rounded-full ${className}`} size="icon" variant="ghost">
+        <Button className={`ml-3 mt-3 rounded-full sm:ml-6 ${className}`} size="icon" variant="ghost">
           <Pencil />
         </Button>
       </DialogTrigger>

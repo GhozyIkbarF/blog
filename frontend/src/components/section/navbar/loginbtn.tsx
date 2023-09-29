@@ -8,7 +8,7 @@ const LoginBtn = () => {
       <Link href="/login">
         <Button>Login</Button>
       </Link>
-      <Link href="/signup">
+      <Link href="/signup" className="hidden sm:inline-block">
         <Button variant="ghost">Sign Up</Button>
       </Link>
     </>

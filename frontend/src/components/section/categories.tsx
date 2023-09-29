@@ -1,5 +1,6 @@
 import React from 'react'
 import { Toggle } from "@/components/ui/toggle"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const categories = [
   {
@@ -30,7 +31,7 @@ const categories = [
 
 const Categories = ({ className }: { className?: string }) => {
   return (
-    <div className={`flex gap-2 ${className}`}>
+    <div className={`flex gap-2 overflow-x-auto ${className}`}>
       {categories.map((category, index) => (
         <Toggle key={index} variant="outline" aria-label="Toggle category" className="border-dashed">
           {category.label}
