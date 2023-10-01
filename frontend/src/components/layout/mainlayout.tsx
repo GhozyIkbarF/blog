@@ -50,7 +50,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <main className="min-h-screen w-4/6 py-5 mx-auto flex flex-col gap-2">
+      <main className="min-h-screen w-full py-5 mx-auto flex flex-col gap-2 sm:w-4/6">
         <Navbar />
         {children}
       </main>

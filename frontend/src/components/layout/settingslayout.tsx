@@ -19,7 +19,7 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
       <section>
         <Card>
           <section className="flex flex-col">
-            <div className="flex flex-row ml-6 mt-3 items-center">
+            <div className="flex flex-row ml-3 mt-3 items-center sm:ml-6">
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -34,18 +34,18 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
               </TooltipProvider>
               <h3 className="ml-3">Settings</h3>
             </div>
-            <div className="flex flex-row w-full justify-between">
-              <aside className="w-[25%]">
-                <ul className="list-none">
-                  <li>
+            <div className="flex flex-col w-full justify-between sm:flex-row">
+              <aside className="w-full sm:w-[25%]">
+                <ul className="flex flex-row list-none gap-2 m-6 sm:mr-0 sm:flex-col sm:gap-0">
+                  <li className="w-1/2 sm:w-full">
                     <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/settings/profile")}>Profile</Button>
                   </li>
-                  <li>
+                  <li className="w-1/2 sm:w-full">
                     <Button className="w-full justify-start" variant="outline" onClick={() => router.push("/settings/password")}>Password</Button>
                   </li>
                 </ul>
               </aside>
-              <section className="w-[75%] py-6 px-6">
+              <section className="w-full pb-6 px-6 sm:w-[75%] sm:py-6">
                 {children}
               </section>
             </div>

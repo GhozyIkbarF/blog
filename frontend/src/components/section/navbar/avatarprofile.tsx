@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -30,9 +30,8 @@ import { useDispatch } from "react-redux";
 import { setIsLogin, setUserData } from "@/Utlis";
 
 const AvatarProfile = () => {
-  const myItemRef = useRef<HTMLButtonElement | null>(null);
+  const [open, setOpen] = useState(false);
   const { userData } = useSelector((state: RootState) => state.utils);
-
   const router = useRouter();
   const dispatch = useDispatch();
   const { toast } = useToast();
@@ -48,7 +47,6 @@ const AvatarProfile = () => {
         duration: 2500,
       });
       if (res) {
-        if (myItemRef.current) myItemRef.current.click();
         router.push("/");
         dispatch(setIsLogin(false));
         dispatch(setUserData({
@@ -58,6 +56,7 @@ const AvatarProfile = () => {
           username: "",
           // photoProfile: "",
         }))
+        setOpen(false);
       }
     } catch (err) {
       console.error(err);
@@ -91,7 +90,7 @@ const AvatarProfile = () => {
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <AlertDialog>
+          <AlertDialog open={open} onOpenChange={() => setOpen(true)}>
             <AlertDialogTrigger asChild className="px-2 py-1.5">
               <Button className="w-full justify-start text-red-500 hover:text-red-500" variant="ghost" size="sm">
                 <LogOut className="mr-2 h-4 w-4 text-red-500" /> Log Out
@@ -106,8 +105,8 @@ const AvatarProfile = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel ref={myItemRef}>Cancel</AlertDialogCancel>
-                <Button variant="destructive" onClick={() => logout()}>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <Button variant="destructive" className="w-1/2 sm:w-auto" onClick={() => logout()}>
                   Log Out
                 </Button>
               </AlertDialogFooter>
@@ -115,7 +114,7 @@ const AvatarProfile = () => {
           </AlertDialog>
         </DropdownMenuContent>
       </DropdownMenu>
-      <div className="flex flex-col">
+      <div className="hidden sm:flex sm:flex-col">
         <h6 className="text-sm">{userData.name}</h6>
         <h6 className="text-sm text-muted-foreground">@{userData.username}</h6>
       </div>

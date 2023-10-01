@@ -37,7 +37,7 @@ export const refreshToken = async (req, res) => {
           { userId, name, username, userEmail },
           process.env.ACCESS_TOKEN_SECRET,
           {
-            expiresIn: 5 * 60,
+            expiresIn: 15 * 60,
           }
         );
         res.cookie("refreshToken", refreshToken, {

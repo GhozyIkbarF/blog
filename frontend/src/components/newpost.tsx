@@ -1,43 +1,13 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Globe,
-  ChevronsUpDown,
-  Check,
-  Lock,
-  PenSquare,
-  Image as ImageIcon,
-} from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Globe, ChevronsUpDown, Check, Lock, PenSquare, Image as ImageIcon, X } from "lucide-react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -48,6 +18,7 @@ import { useDispatch } from "react-redux";
 import { setPosts } from "@/Utlis";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 interface Categories {
   value: string;
@@ -93,12 +64,13 @@ interface Inputs {
 
 const NewPost = () => {
   const dispatch = useDispatch();
-  const router = useRouter();
+  const myItemRef = useRef<HTMLButtonElement | null>(null);
   const maxCharLength = 2500;
   const [open, setOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [text, setText] = useState("");
   const { userData, posts } = useSelector((state: RootState) => state.utils);
+
   const btnClose: HTMLElement | null =
     document.getElementById("btn-close-dialog");
 
@@ -160,7 +132,10 @@ const NewPost = () => {
         title: "Create new post is success!",
         duration: 2500,
       });
-      btnClose?.click();
+      setText("")
+      setPreviewImage("")
+      setValue("file", "")
+      if (myItemRef.current) myItemRef.current.click();
     } catch (err) {
       console.error(err);
       toast({
@@ -183,11 +158,13 @@ const NewPost = () => {
     handleSubmit(onSubmit);
   };
 
+
   useEffect(() => {
     if (typeof file !== "string" && file?.length > 0) {
       setPreviewImage(URL.createObjectURL(file[0]));
     }
   }, [file]);
+
 
   const deletePreviewImage = () => {
     setPreviewImage("");
@@ -205,12 +182,12 @@ const NewPost = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" className="font-bold">
-          <PenSquare className="mr-2" />
-          <span>New Post</span>
+        <Button type="button" className="px-2 font-bold sm:px-4">
+          <PenSquare className="sm:mr-2" />
+          <span className="hidden sm:inline-block">New Post</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl overflow-y-auto">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>New Post</DialogTitle>
@@ -279,7 +256,7 @@ const NewPost = () => {
               )}
             </div>
           </div>
-          <DialogFooter className="flex-col sm:justify-between">
+          <DialogFooter className="flex-col gap-3 sm:justify-between">
             <div className="flex justify-start gap-2">
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
@@ -313,8 +290,9 @@ const NewPost = () => {
                   >
                     {category
                       ? categories.find((item) => item.value === category)
-                          ?.label
-                      : "Select category..."}
+
+                        ?.label
+                      : "Category..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -368,6 +346,10 @@ const NewPost = () => {
             </Button>
           </DialogFooter>
         </form>
+        <DialogClose ref={myItemRef} className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogClose>
       </DialogContent>
     </Dialog>
   );

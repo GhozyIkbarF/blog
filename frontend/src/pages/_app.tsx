@@ -8,7 +8,6 @@ import Layout from "@/components/layout/mainlayout";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-
   if (router.pathname === "/signup" || router.pathname === "/login")
     return (
       <Provider store={store}>

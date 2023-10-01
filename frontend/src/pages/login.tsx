@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 import Title from '@/components/head'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -70,11 +71,10 @@ const Login = () => {
   };
 
   useEffect(() => {
-    console.log(isLogin);
     if (isLogin) {
       router.push('/')
     }
-  },[])
+  },[isLogin])
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -149,6 +149,9 @@ const Login = () => {
               </CardFooter>
             </form>
           </Card>
+          <Button asChild className="w-96" variant="ghost">
+            <Link href="/signup">Sign Up</Link>
+          </Button>
         </div>
       </main>
 

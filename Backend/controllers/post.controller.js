@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import { prismaClient } from "../src/prisma-client.js";
 import fs from "fs";
 import path from "path";
-import { log } from "console";
+
 
 export const createPost = async (req, res) => {
   const { authorId, title, content, published, category } = req.body;
@@ -77,10 +77,10 @@ export const getProfilePosts = async (req, res) => {
   const authHeader = req.get('Authorization');
   const token = authHeader && authHeader.split(' ')[1];
   let authorId = parseInt(req.params.id);
+  let posts;
   try {
     async function getPost() {
-      console.log('post true');
-      const posts = await prismaClient.post.findMany({
+      posts = await prismaClient.post.findMany({
         where: { authorId: parseInt(req.params.id), published: true },
         include: {
           author: {
@@ -105,7 +105,7 @@ export const getProfilePosts = async (req, res) => {
       res.status(200).json(posts);
     }
     async function getPostProfile() {
-      const posts = await prismaClient.post.findMany({
+      posts = await prismaClient.post.findMany({
         where: { authorId: parseInt(req.params.id) },
         include: {
           author: {
@@ -191,6 +191,16 @@ export const updatePost = async (req, res) => {
         const post = await prisma.post.update({
           where: { id: parseInt(req.params.id) },
           data: updateData,
+          include: {
+            author: {
+              select: {
+                name: true,
+                username: true,
+                email: true,
+                photo_profile: true,
+              },
+            },
+          },
         });
         return [searchPost, post];
       }
@@ -205,10 +215,6 @@ export const updatePost = async (req, res) => {
               .status(500)
               .json({ error: "An error occurred while deleting the file." });
           }
-          // return res.status(201).json({
-          //   data: post,
-          //   message: "post is successfully updated",
-          // });
         });
       }
     }

@@ -126,9 +126,6 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
   const file = watch("file");
 
   const { toast } = useToast();
-
-  useEffect(() => { }, [file]);
-
   
   const convertToFormData = (data: Inputs) => {
     const formData = new FormData();
@@ -180,6 +177,7 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
   };
 
   const handleEditPost = () => {
+    console.log(index);
     const post = posts[index!];
     setValue("title", post.title);
     setValue("content", post.content);

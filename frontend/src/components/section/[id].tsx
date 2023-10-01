@@ -77,9 +77,7 @@ const ProfilePosts = () => {
   return (
     <article className="flex flex-col">
       <h4 className="pb-3 text-center">
-        {posts.length > 1
-          ? `${posts.length} Posts in all categories`
-          : `${posts.length} Post in all categories`}
+        {`${posts.length} ${posts.length > 1 ? `Posts` : `Post`} in all categories`}
       </h4>
       {posts.length > 0 && <Separator />}
       {posts?.map((post: any, index: number) => (
@@ -89,7 +87,7 @@ const ProfilePosts = () => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <Button className="ml-6 mt-6 rounded-full" size="icon" variant="outline" onClick={() => router.push(`/post/${post.id}`)}>
+                    <Button className="ml-3 mt-3 rounded-full sm:ml-6 sm:mt-6" size="icon" variant="outline" onClick={() => router.push(`/post/${post.id}`)}>
                       <Eye />
                     </Button>
                   </TooltipTrigger>
@@ -103,7 +101,7 @@ const ProfilePosts = () => {
                   <EditPost id={post.id} index={index} />
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button className="ml-6 mt-3 mb-6 rounded-full" size="icon" variant="ghost">
+                      <Button className="ml-3 mt-3 mb-3 rounded-full sm:ml-6 sm:mb-6" size="icon" variant="ghost">
                         <Trash2 className="text-red-500" />
                       </Button>
                     </AlertDialogTrigger>
@@ -116,7 +114,7 @@ const ProfilePosts = () => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel ref={myItemRef}>Cancel</AlertDialogCancel>
-                        <Button variant="destructive" onClick={() => deletePost(post.id, index)}>Delete</Button>
+                        <Button variant="destructive" className="w-1/2 sm:w-auto" onClick={() => deletePost(post.id, index)}>Delete</Button>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
@@ -124,14 +122,14 @@ const ProfilePosts = () => {
               }
             </div>
             <article className="flex flex-col justify-between">
-              <CardContent className="pt-6 pb-3">
-                <CardTitle className="line-clamp-1">{post.title}</CardTitle>
-                {post.category && <Badge className="mt-3 cursor-default">{post.category.replace(/\b\w/g, l => l.toUpperCase())}</Badge>}
+              <CardContent className="pt-3 pb-3 sm:pt-6">
+                <CardTitle className="line-clamp-1 hover:underline cursor-pointer" onClick={() => router.push(`/post/${post.id}`)}>{post.title}</CardTitle>
+                {post.category && <Badge className="mt-3 cursor-default">{(post.category as string).replace(/\b\w/g, l => l.toUpperCase())}</Badge>}
                 <p className="line-clamp-3">{post.content}</p>
               </CardContent>
-              <footer className="m-0 px-6 pb-6 flex flex-row items-center">
-                {post.published ?
-                  <Globe className="w-[18px] h-[18px] mr-1 text-muted-foreground" />
+              <footer className="m-0 px-3 pb-3 flex flex-row items-center sm:px-6 sm:pb-6">
+                {post.published
+                  ? <Globe className="w-[18px] h-[18px] mr-1 text-muted-foreground" />
                   : <Lock className="w-[18px] h-[18px] mr-1 text-muted-foreground" />
                 }
                 <CardDescription className="[&:not(:first-child)]:mt-0">{createdAt(post.createdAt)}</CardDescription>
