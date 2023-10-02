@@ -27,6 +27,7 @@ import { RootState } from "@/store";
 import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import DetailPostLoad from "@/components/skeleton/detailpostload";
 
 interface DetailedPost {
   author: {
@@ -52,18 +53,22 @@ const DetailedPost = () => {
   const [detailPost, setDetailPost] = useState<DetailedPost>();
   const myItemRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
+  const [isLoading, setLoading] = useState(true);
   const { toast } = useToast();
   const id: number | undefined = parseInt(router.query.id as string);
 
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
 
   const getDetailPost = async (id: number) => {
+    setLoading(true)
     try {
       const res = await axios.get(`${baseURL}/post/${id}`);
       setDetailPost(res.data);
     } catch (err) {
       console.log(err);
       return router.push("/404")
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -89,6 +94,8 @@ const DetailedPost = () => {
       })
     }
   }
+
+  if (isLoading) return <DetailPostLoad />;
 
   return (
     <>
@@ -155,11 +162,11 @@ const DetailedPost = () => {
               }
             </CardHeader>
             <article className="flex flex-col">
-              <CardContent>
+              <CardContent className="pt-3">
                 <Badge className="mb-3 cursor-default">{detailPost?.category.replace(/\b\w/g, l => l.toUpperCase())}</Badge>
                 <h2 className="mb-3">{detailPost?.title}</h2>
                 <div className="relative h-96">
-                  <Image src={(detailPost?.image as string)?.replace(/\\/g, "/")} className="object-contain" fill={true} alt="image" priority={true} />
+                  <Image src={(detailPost?.image as string)?.replace(/\\/g, "/")} className="object-contain" fill={true} alt="image" priority />
                 </div>
                 <p>{detailPost?.content}</p>
               </CardContent>

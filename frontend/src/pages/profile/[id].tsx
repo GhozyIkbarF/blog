@@ -6,11 +6,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Undo2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Categories from '@/components/section/categories'
-import ProfilePosts from '@/components/section/[id]'
+import ProfilePosts from '@/components/section/content/[id]'
 import Title from '@/components/head'
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import axios from 'axios'
+import ProfileLoad from '@/components/skeleton/profileload'
 
 interface DetailedProfile {
   name: string;
@@ -24,15 +25,19 @@ const Profile = () => {
   const id: number | undefined = parseInt(router.query.id as string);
   const [detailProfile, setDetailProfile] = useState<DetailedProfile>();
   const { userData } = useSelector((state: RootState) => state.utils);
+  const [isLoading, setLoading] = useState(true);
 
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
 
   const getDetailProfile = async (id: number) => {
+    setLoading(true)
     try {
       const res = await axios.get(`${baseURL}/user/${id}`);
       setDetailProfile(res.data);
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -40,6 +45,8 @@ const Profile = () => {
     if (!id) return;
     getDetailProfile(id);
   }, [id]);
+
+  if (isLoading) return <ProfileLoad />;
 
   return (
     <>

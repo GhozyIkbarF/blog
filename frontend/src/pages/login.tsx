@@ -55,7 +55,6 @@ const Login = () => {
         duration: 2500,
       })
       reset();
-      console.log(res);
       clearErrors(["email", "password"]);
       router.push('/')
     } catch (err) {
