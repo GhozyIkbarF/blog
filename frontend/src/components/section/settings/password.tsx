@@ -104,7 +104,7 @@ const Password = () => {
 
       <h4>Password</h4>
       <small className="muted-text">
-        This is how others will see you on the site.
+        This is your secret code to login.
       </small>
       <Separator className="my-6" />
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -115,7 +115,7 @@ const Password = () => {
                 htmlFor={item.id}
                 className="after:content-['*'] after:text-red-500"
               >
-                {item.label}
+                {item.label}{" "}
               </Label>
               <div className="relative">
                 <Input
@@ -136,7 +136,6 @@ const Password = () => {
                         className="absolute top-0.5 right-0.5 text-muted-foreground cursor-pointer hover:bg-transparent"
                         variant="ghost"
                         size="sm"
-
                       >
                         {showPassword ? <EyeOff /> : <Eye />}
                       </Button>

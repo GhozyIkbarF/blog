@@ -175,7 +175,7 @@ const NewPost = () => {
           <span className="hidden sm:inline-block">New Post</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl overflow-y-auto">
+      <DialogContent className="max-w-4xl">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>New Post</DialogTitle>
@@ -239,9 +239,9 @@ const NewPost = () => {
                   </TooltipTrigger>
                   <TooltipContent>
                     {published ? (
-                      <p>Everybody can see your post</p>
+                      <p className="text-sm">Everybody can see your post</p>
                     ) : (
-                      <p>Only you can see your post</p>
+                      <p className="text-sm">Only you can see your post</p>
                     )}
                   </TooltipContent>
                 </Tooltip>
