@@ -34,6 +34,7 @@ const Post = () => {
     fetch(`${baseURL}/posts`)
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         dispatch(setPosts(data));
         setLoading(false);
       });

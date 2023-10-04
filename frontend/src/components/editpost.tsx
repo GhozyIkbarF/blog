@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,9 +37,10 @@ import {
   ChevronsUpDown,
   Check,
   Lock,
-  PenSquare,
   Pencil,
+  X 
 } from "lucide-react";
+import { DialogClose } from "@radix-ui/react-dialog";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -93,6 +94,7 @@ interface Inputs {
 
 const EditPost = ({ id, index, className }: { id?: number, index?: number, className?: string }) => {
   const [open, setOpen] = useState(false);
+  const myItemRef = useRef<HTMLButtonElement | null>(null);
   const { userData, posts } = useSelector((state: RootState) => state.utils);
   const maxCharLength = 2500;
   const [text, setText] = useState("");
@@ -124,6 +126,7 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
   const category = watch("category");
   const published = watch("published");
   const file = watch("file");
+  
 
   const { toast } = useToast();
   
@@ -134,10 +137,11 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
     formData.append("content", data.content);
     formData.append("category", data.category);
     formData.append("published", data.published.toString());
+    console.log(data.file[0]);
     formData.append("file", data.file[0]);
     return formData;
   };
-  
+
   const headers = {
     "Content-Type": "multipart/form-data",
   };
@@ -150,6 +154,7 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
       postList[index!] = res.data
       dispatch(setPosts(postList))
       reset();
+      if (myItemRef.current) myItemRef.current.click();
       toast({
         title: "post updated successfully",
         duration: 2500,
@@ -177,7 +182,6 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
   };
 
   const handleEditPost = () => {
-    console.log(index);
     const post = posts[index!];
     setValue("title", post.title);
     setValue("content", post.content);
@@ -355,6 +359,10 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
             </Button>
           </DialogFooter>
         </form>
+        <DialogClose ref={myItemRef} className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogClose>
       </DialogContent>
     </Dialog >
   );

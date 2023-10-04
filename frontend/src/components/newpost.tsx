@@ -11,12 +11,12 @@ import { Globe, ChevronsUpDown, Check, Lock, PenSquare, Image as ImageIcon, X } 
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { CREATE_POST } from "@/validation";
 import { useToast } from "@/components/ui/use-toast";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useDispatch } from "react-redux";
 import { setPosts } from "@/Utlis";
-import { useRouter } from "next/router";
 import Image from "next/image";
 import { DialogClose } from "@radix-ui/react-dialog";
 
@@ -71,9 +71,6 @@ const NewPost = () => {
   const [text, setText] = useState("");
   const { userData, posts } = useSelector((state: RootState) => state.utils);
 
-  const btnClose: HTMLElement | null =
-    document.getElementById("btn-close-dialog");
-
   const {
     register,
     handleSubmit,
@@ -84,12 +81,13 @@ const NewPost = () => {
     watch,
     formState: { errors },
   } = useForm<Inputs>({
-    // resolver: yupResolver(EDIT_PASSWORD),
+    resolver: yupResolver(CREATE_POST as any),
     defaultValues: {
       title: "",
       content: "",
       published: true,
       category: "",
+      file: "",
     },
   });
 
@@ -98,8 +96,6 @@ const NewPost = () => {
   const file = watch("file");
 
   const { toast } = useToast();
-
-  useEffect(() => {}, [file]);
 
   const headers = {
     "Content-Type": "multipart/form-data",
@@ -124,17 +120,11 @@ const NewPost = () => {
       const postData = convertToFormData(data);
       const res = await axios.post(`${baseURL}/post`, postData, { headers });
       dispatch(setPosts([res.data, ...posts]));
-      reset();
-      setText("");
-      setPreviewImage("");
-      setValue("file", "");
+      onClosed()
       toast({
         title: "Create new post is success!",
         duration: 2500,
       });
-      setText("")
-      setPreviewImage("")
-      setValue("file", "")
       if (myItemRef.current) myItemRef.current.click();
     } catch (err) {
       console.error(err);
@@ -179,6 +169,14 @@ const NewPost = () => {
     return inputText.length;
   };
 
+  const onClosed = () => {
+    clearErrors(["title", "category", "content", "published", "file"]);
+    reset()
+    setText("")
+    setPreviewImage("")
+    setValue("file", "")
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -202,6 +200,7 @@ const NewPost = () => {
                 id="title"
                 placeholder="Summarize your thoughts"
               />
+              {errors.title && <small className="text-red-500">{errors.title?.message}</small>}
             </div>
             <div className="flex flex-col space-y-3">
               <div className="flex flex-row justify-between">
@@ -223,6 +222,7 @@ const NewPost = () => {
                 onChange={handleText}
                 placeholder="Write your mind here"
               />
+              {errors.content && <small className="text-red-500">{errors.content?.message}</small>}
             </div>
             <div className="flex flex-col space-y-3">
               <Label
@@ -281,20 +281,23 @@ const NewPost = () => {
               </TooltipProvider>
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-[200px] justify-between"
-                  >
-                    {category
-                      ? categories.find((item) => item.value === category)
+                  <div className="flex flex-col items-start gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-[200px] justify-between"
+                    >
+                      {category
+                        ? categories.find((item) => item.value === category)
 
-                        ?.label
-                      : "Category..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
+                          ?.label
+                        : "Category..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                {errors.category && <small className="text-red-500">{errors.category?.message}</small>}
+                  </div>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0">
                   <Command>
@@ -327,7 +330,7 @@ const NewPost = () => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div>
+                    <div className="flex flex-col items-start">
                       <Input
                         {...register("file")}
                         type="file"
@@ -335,6 +338,7 @@ const NewPost = () => {
                         className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-all"
                         accept="image/*"
                       />
+                      {errors.file && <small className="text-red-500">{errors.file?.message}</small>}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>Add an image</TooltipContent>
@@ -346,7 +350,11 @@ const NewPost = () => {
             </Button>
           </DialogFooter>
         </form>
-        <DialogClose ref={myItemRef} className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <DialogClose 
+          ref={myItemRef} 
+          onClick={() => onClosed()} 
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+        >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogClose>

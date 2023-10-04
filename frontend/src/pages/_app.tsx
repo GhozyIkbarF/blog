@@ -8,7 +8,7 @@ import Layout from "@/components/layout/mainlayout";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  if (router.pathname === "/signup" || router.pathname === "/login")
+  if (router.pathname === "/signup" || router.pathname === "/login" || router.pathname === "/forgot-password")
     return (
       <Provider store={store}>
         <ThemeProvider>

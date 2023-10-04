@@ -35,7 +35,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           name: decode.name,
           username: decode.username,
           userEmail: decode.userEmail,
-          userId: decode.userId
+          userId: decode.userId,
+          photoProfile: res.data.photoProfile,
         }));
       }
     } catch (err) {

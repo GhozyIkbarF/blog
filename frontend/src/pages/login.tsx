@@ -32,6 +32,7 @@ const Login = () => {
     handleSubmit,
     reset,
     clearErrors,
+    setError,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: yupResolver(LOGIN),
@@ -58,15 +59,21 @@ const Login = () => {
         duration: 2500,
       })
       reset();
-      console.log(res);
       clearErrors(["email", "password"]);
       router.push('/')
-    } catch (err) {
-      console.log(err)
-      toast({
-        title: "Sign Up Failed!",
-        duration: 5000,
-      })
+    } catch (err: any) {
+      if(err.response){
+        for(const error in err.response.data){
+         setError(error as 'email' | 'password', {
+            type: "manual",
+            message: err.response.data[error],
+          });
+        }
+        toast({
+          title: "Sign Up Failed!",
+          duration: 5000,
+        })
+      }
     }
   };
 
@@ -108,10 +115,13 @@ const Login = () => {
                         },
                       })}
                     />
-                    {errors.email && <small className="text-red-500">{errors.email.message}</small>}
+                    {errors.email && <small className="text-red-500">{errors.email?.message}</small>}
                   </div>
                   <div className="flex flex-col space-y-3">
-                    <Label htmlFor="password" className="after:content-['*'] after:text-red-500">Password </Label>
+                    <div className='flex justify-between items-end'>
+                      <Label htmlFor="password" className="after:content-['*'] after:text-red-500">Password </Label>
+                      <Link href="/forgot-password" className='text-sm'>Forgot Password?</Link>
+                    </div>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
@@ -140,7 +150,7 @@ const Login = () => {
                         </Tooltip>
                       </TooltipProvider>
                     </div>
-                    {errors.password && <small className="text-red-500">{errors.password.message}</small>}
+                    {errors.password && <small className="text-red-500">{errors.password?.message}</small>}
                   </div>
                 </div>
               </CardContent>

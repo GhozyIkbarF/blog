@@ -19,7 +19,7 @@ interface UserData {
   userEmail: string;
   userId: number;
   username: string;
-  // photoProfile: string;
+  photoProfile: string;
 }
 
 interface StateSlice {
