@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import Link from "next/link";
 import Title from "@/components/head";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Slider } from "@/components/ui/slider"
 import { Eye, EyeOff } from "lucide-react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -14,6 +16,7 @@ import { useRouter } from "next/router";
 import axios from 'axios'
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
+import AvatarEditor from "react-avatar-editor";
 
 interface Inputs {
   name: string;
@@ -27,7 +30,11 @@ interface Inputs {
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const [src, setSrc] = useState("");
+  const [preview, setPreview] = useState(""); // value harusnya ambil dari foto di database
+  const [cropping, setCropping] = useState(false);
+  const [slideValue, setSlideValue] = useState([10]);
+  const cropRef = useRef(null);
   const router = useRouter();
 
   const {
@@ -84,6 +91,36 @@ const SignUp = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  const handleImgChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setSrc(URL.createObjectURL(file));
+    setCropping(true);
+    console.log(cropping);
+  };
+
+  const handleSave = async () => {
+    if (cropRef) {
+      const dataUrl = cropRef.current?.getImage().toDataURL();
+      console.log(dataUrl);
+      const result = await fetch(dataUrl);
+      const blob = await result.blob();
+      setPreview(URL.createObjectURL(blob));
+      setCropping(false);
+    }
+  };
+
+  const handleCancelCropping = () => {
+    setPreview("") // set value kembali dari foto database
+    setSrc("")
+    setCropping(false)
+    // setValue("file", )
+  }
+
+  const deleteAvatar = () => {
+    setPreview("") // hapus foto dari database
+    // setValue("file", )
+  }
+
   const inputData = [
     {
       label: "Name",
@@ -111,9 +148,9 @@ const SignUp = () => {
     },
     {
       label: "Photo profile",
-      type: "text",
+      type: "file",
       id: "photo_profile",
-      placeholder: "Enter your photo profile",
+      placeholder: "Upload your avatar",
       error: errors.photo_profile,
       errorMessage: errors.photo_profile?.message,
     },
@@ -154,8 +191,8 @@ const SignUp = () => {
                   {inputData.map((item, index) => (
                     <div key={index} className="flex flex-col space-y-3">
                       <Label htmlFor="email" className="after:content-['*'] after:text-red-500">{item.label} </Label>
-                      {item.type !== "password" ? (
-                        <Input
+                      {item.type !== "password" && item.type !== "file"
+                        ? <Input
                           type={item.type}
                           {...register(
                             item.id as
@@ -170,74 +207,124 @@ const SignUp = () => {
                           placeholder={item.placeholder}
                           autoComplete="on"
                         />
-                      ) : (
-                        <div className="relative">
-                          <Input
-                            type={
-                              item.id === "password"
-                                ? showPassword
-                                  ? "text"
-                                  : "password"
-                                : showConfirmPassword
-                                  ? "text"
-                                  : "password"
-                            }
-                            id={item.id}
-                            placeholder={item.placeholder}
-                            {...register(
-                              item.id as
-                              | "name"
-                              | "username"
-                              | "email"
-                              | "password"
-                              | "confirmPassword",
-                              { required: true }
-                            )}
-                          />
-                          <TooltipProvider>
-                            <Tooltip delayDuration={0}>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  type="button"
-                                  onClick={
-                                    item.id === "password"
-                                      ? togglePasswordVisibility
-                                      : toggleConfirmPasswordVisibility
-                                  }
-                                  className="absolute top-0.5 right-0.5 text-muted-foreground cursor-pointer hover:bg-transparent"
-                                  variant="ghost"
-                                  size="sm"
-                                >
-                                  {item.id === "password" ? (
-                                    showPassword ? (
+                        : item.type === "password" ?
+                          <div className="relative">
+                            <Input
+                              type={
+                                item.id === "password"
+                                  ? showPassword
+                                    ? "text"
+                                    : "password"
+                                  : showConfirmPassword
+                                    ? "text"
+                                    : "password"
+                              }
+                              id={item.id}
+                              placeholder={item.placeholder}
+                              {...register(
+                                item.id as
+                                | "name"
+                                | "username"
+                                | "email"
+                                | "photo_profile"
+                                | "password"
+                                | "confirmPassword",
+                                { required: true }
+                              )}
+                            />
+                            <TooltipProvider>
+                              <Tooltip delayDuration={0}>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    onClick={
+                                      item.id === "password"
+                                        ? togglePasswordVisibility
+                                        : toggleConfirmPasswordVisibility
+                                    }
+                                    className="absolute top-0.5 right-0.5 text-muted-foreground cursor-pointer hover:bg-transparent"
+                                    variant="ghost"
+                                    size="sm"
+                                  >
+                                    {item.id === "password" ? (
+                                      showPassword ? (
+                                        <EyeOff />
+                                      ) : (
+                                        <Eye />
+                                      )
+                                    ) : showConfirmPassword ? (
                                       <EyeOff />
                                     ) : (
                                       <Eye />
+                                    )}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {item.id === "password" ? (
+                                    showPassword ? (
+                                      "Hide password"
+                                    ) : (
+                                      "Show password"
                                     )
                                   ) : showConfirmPassword ? (
-                                    <EyeOff />
-                                  ) : (
-                                    <Eye />
-                                  )}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {item.id === "password" ? (
-                                  showPassword ? (
                                     "Hide password"
                                   ) : (
                                     "Show password"
-                                  )
-                                ) : showConfirmPassword ? (
-                                  "Hide password"
-                                ) : (
-                                  "Show password"
-                                )}
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      )}
+                                  )}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                          : <div className="">
+                            {preview &&
+                              <div className="grid">
+                                <Avatar className="justify-self-center w-44 h-44">
+                                  <AvatarImage src={preview} />
+                                  <AvatarFallback className="text-5xl sm:text-7xl">A</AvatarFallback>
+                                </Avatar>
+                              </div>
+                            }
+                            {cropping &&
+                              <div className="grid">
+                                <div className="justify-self-center">
+                                  <AvatarEditor
+                                    ref={cropRef}
+                                    image={src}
+                                    width={176}
+                                    height={176}
+                                    border={0}
+                                    borderRadius={150}
+                                    color={[0, 0, 0, 0.5]}
+                                    scale={slideValue[0] / 10}
+                                    rotate={0}
+                                  />
+                                </div>
+                                <div className="my-3 flex flex-row justify-center gap-2">
+                                  <Slider min={10} max={100} step={1} name="slider" className="cursor-pointer" value={slideValue} onValueChange={(e) => setSlideValue(e)} />
+                                  <Button type="button" onClick={handleSave}>Crop</Button>
+                                  <Button type="button" variant="outline" onClick={handleCancelCropping}>Cancel</Button>
+                                </div>
+                              </div>
+                            }
+                            {preview && <Button type="button" className="my-3" variant="destructive" onClick={deleteAvatar}>Remove Avatar</Button>}
+                            <Input
+                              type={item.type}
+                              id={item.id}
+                              className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-all"
+                              accept="image/*"
+                              {...register(
+                                item.id as
+                                | "name"
+                                | "username"
+                                | "email"
+                                | "photo_profile"
+                                | "password"
+                                | "confirmPassword",
+                              )}
+                              onChange={handleImgChange}
+                            />
+                          </div>
+                      }
                       {item.error && <small className="text-red-500">{item.errorMessage}</small>}
                     </div>
                   ))}
