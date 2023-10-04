@@ -6,7 +6,7 @@ import { useTheme } from "next-themes"
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Moon, Sun, PenSquare } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 import NewPost from './newpost'
 import AvatarProfile from './avatarprofile'
 import LoginBtn from './loginbtn';

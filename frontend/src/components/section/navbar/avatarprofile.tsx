@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -32,6 +32,7 @@ import { setIsLogin, setUserData } from "@/Utlis";
 const AvatarProfile = () => {
   const myItemRef = useRef<HTMLButtonElement | null>(null);
   const { userData } = useSelector((state: RootState) => state.utils);
+  const [data, setData] = useState(userData);
   const router = useRouter();
   const dispatch = useDispatch();
   const { toast } = useToast();
@@ -55,7 +56,7 @@ const AvatarProfile = () => {
           userEmail: "",
           userId: 0,
           username: "",
-          // photoProfile: "",
+          photoProfile: "",
         }))
       }
     } catch (err) {
@@ -67,20 +68,24 @@ const AvatarProfile = () => {
     }
   };
 
+  useEffect(() => {
+    setData(userData);
+  }, [userData])
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer">
-            <AvatarImage src="" />
-            <AvatarFallback>{userData.name?.split('')[0].toLocaleUpperCase()}</AvatarFallback>
+            <AvatarImage src={data.photoProfile} />
+            <AvatarFallback>{data.name?.split('')[0].toLocaleUpperCase()}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/profile/${userData.userId}`)}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push(`/profile/${data.userId}`)}>
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
@@ -115,8 +120,8 @@ const AvatarProfile = () => {
         </DropdownMenuContent>
       </DropdownMenu>
       <div className="hidden sm:flex sm:flex-col">
-        <h6 className="text-sm">{userData.name}</h6>
-        <h6 className="text-sm text-muted-foreground">@{userData.username}</h6>
+        <h6 className="text-sm">{data.name}</h6>
+        <h6 className="text-sm text-muted-foreground">@{data.username}</h6>
       </div>
     </>
   );

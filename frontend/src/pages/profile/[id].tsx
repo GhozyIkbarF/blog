@@ -73,7 +73,7 @@ const Profile = () => {
             <div className="flex justify-center">
               <CardHeader className="flex flex-row space-y-0 px-3 pt-3 pb-0 sm:px-6 sm:pt-6">
                 <Avatar className="w-28 h-28 sm:w-32 sm:h-32">
-                  <AvatarImage src="" />
+                  <AvatarImage src={detailProfile?.photo_profile} />
                   <AvatarFallback className="text-3xl sm:text-5xl">{detailProfile?.name.split('')[0].toLocaleUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="ml-3 flex flex-col justify-between sm:ml-6">

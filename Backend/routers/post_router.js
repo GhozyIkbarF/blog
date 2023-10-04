@@ -8,22 +8,9 @@ import {
   updatePost,
   deletePost,
 } from "../controllers/post.controller.js";
-import multer from "multer";
+import { upload } from "../helpers/uploadImage.js";
 
 const post_router = express.Router();
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./public/data/images");
-  },
-  filename: function (req, file, cb) {
-    const extention = file.originalname.split(".").pop();
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + "." + extention);
-  },
-});
-
-const upload = multer({ storage: storage });
-
 // post_router.post('/post', verifyToken, createPost);
 // post_router.get('/post/:id', verifyToken, getPost);
 // post_router.delete('/post/:id', verifyToken, deletePost);

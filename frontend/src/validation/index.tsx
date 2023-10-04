@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-export const CREATE_USER = Yup.object().shape({
+const CREATE_USER = Yup.object().shape({
   name: Yup.string()
     .max(50, "Maximum name 50 characters")
     .required("Name is required"),
@@ -33,24 +33,40 @@ export const CREATE_USER = Yup.object().shape({
     .oneOf([Yup.ref("password")], "Password doesn't match"),
 });
 
-export const LOGIN = Yup.object().shape({
+const LOGIN = Yup.object().shape({
   email: Yup.string()
     .email("Must a valid email address")
     .required("Email is required"),
   password: Yup.string().required("Password is required"),
 });
 
-export const EDIT_PROFILE = Yup.object().shape({
+const EDIT_PROFILE = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   username: Yup.string().required("Username is required"),
   email: Yup.string().email("Must be a valid email address").required("Email is required"),
   password: Yup.string().required('Password is required'),
 });
 
-export const EDIT_PASSWORD = Yup.object().shape({
+const EDIT_PASSWORD = Yup.object().shape({
   oldPassword: Yup.string().required("Password is required"),
   newPassword: Yup.string().required("Password is required"),
   confirmPassword: Yup.string()
-    .required("Confirm Password is required")
-    .oneOf([Yup.ref("newPassword")], "Password doesn't match"),
+  .required("Confirm Password is required")
+  .oneOf([Yup.ref("newPassword")], "Password doesn't match"),
 });
+
+const CREATE_POST = Yup.object().shape({
+  title: Yup.string().required('Title is required'),
+  content: Yup.string().required('Content is required'),
+  published: Yup.boolean().required('Published is required'),
+  category: Yup.string().required('Category is required'),
+  file: Yup.mixed().test('fileType', 'File must be a valid FileList or a string', function (value) {
+    if (value instanceof FileList || typeof value === 'string') {
+      return true;
+    } else {
+      return this.createError({ message: 'File must be a valid FileList or a string' });
+    }
+  }).required('File is required'),
+});
+
+export { CREATE_USER, LOGIN, EDIT_PROFILE, EDIT_PASSWORD, CREATE_POST}

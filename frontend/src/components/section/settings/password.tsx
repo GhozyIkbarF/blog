@@ -30,7 +30,6 @@ const Password = () => {
     reset,
     clearErrors,
     setError,
-    setValue,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: yupResolver(EDIT_PASSWORD),
@@ -65,8 +64,11 @@ const Password = () => {
           duration: 2500,
         });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      if(err.response.data.oldPassword){
+        setError('oldPassword', { type: 'manual', message: 'Old password is not correct' })
+      }
       toast({
         title: "Failed to update password",
         duration: 2500,
