@@ -38,7 +38,7 @@ import {
   Check,
   Lock,
   Pencil,
-  X 
+  X
 } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import axios from "axios";
@@ -126,10 +126,10 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
   const category = watch("category");
   const published = watch("published");
   const file = watch("file");
-  
+
 
   const { toast } = useToast();
-  
+
   const convertToFormData = (data: Inputs) => {
     const formData = new FormData();
     formData.append("authorId", userData.userId?.toString());
@@ -147,7 +147,7 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
   };
   const onSubmit = async (data: Inputs) => {
     const baseURL = process.env.NEXT_PUBLIC_API_CALL;
-    const postList= [...posts]
+    const postList = [...posts]
     try {
       const postData = convertToFormData(data);
       const res = await axios.patch(`${baseURL}/post/edit/${id}`, postData, { headers });
@@ -156,18 +156,18 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
       reset();
       if (myItemRef.current) myItemRef.current.click();
       toast({
-        title: "post updated successfully",
+        title: "Post successfully updated",
         duration: 2500,
       });
     } catch (err) {
       console.error(err);
       toast({
-        title: "post failed to update",
+        title: "Failed to update post",
         duration: 2500,
       });
     }
   };
-  
+
   const handleSelectedCategory = (value: string) => {
     setValue("category", value);
     setOpen(false);
@@ -189,15 +189,15 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
     setValue("published", post.published);
     setValue("file", post.image);
   }
-  
+
   useEffect(() => {
-    if(typeof file !== 'string' && file?.length > 0){
+    if (typeof file !== 'string' && file?.length > 0) {
       setPreviewImage(URL.createObjectURL(file[0]))
-    }else{
+    } else {
       setPreviewImage(file as string)
     }
   }, [file])
-  
+
   const deletePreviewImage = () => {
     setPreviewImage("")
     setValue("file", "")
@@ -214,7 +214,7 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button  type="button" className={`ml-6 mt-3 rounded-full ${className}`} size="icon" variant="ghost" onClick={handleEditPost}>
+        <Button type="button" className={`ml-6 mt-3 rounded-full ${className}`} size="icon" variant="ghost" onClick={handleEditPost}>
           <Pencil />
         </Button>
       </DialogTrigger>
@@ -237,11 +237,7 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
             <div className="flex flex-col space-y-3">
               <div className="flex flex-row justify-between">
                 <Label htmlFor="content">Paragraph</Label>
-                <small
-                  className={`muted-text ${
-                    countCharacters(text) === 2500 ? "text-red-500" : ""
-                  }`}
-                >
+                <small className={`muted-text ${countCharacters(text) === 2500 ? "text-red-500" : ""}`}>
                   {countCharacters(text)} / {maxCharLength}
                 </small>
               </div>
@@ -252,7 +248,7 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
                 id="content"
                 placeholder="Write your mind here"
               />
-              </div>
+            </div>
             <div className="flex flex-col space-y-3">
               <Label htmlFor={"file"} className="flex flex-col gap-1 items-center justify-center cursor-pointer h-28 w-full text-muted-foreground rounded-md border-2 border-input border-dashed bg-background px-3 py-2 transition-colors hover:border-muted-foreground">
                 {previewImage !== ""
@@ -303,7 +299,7 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
                     {category
                       ? categories.find((item) => item.value === category)
                         ?.label
-                      : "Select category..."}
+                      : "Category..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>

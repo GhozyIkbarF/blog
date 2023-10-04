@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast'
 const AvatarSettings = () => {
   const { userData } = useSelector((state: RootState) => state.utils);
   const [src, setSrc] = useState("");
-  const [preview, setPreview] = useState(""); 
+  const [preview, setPreview] = useState("");
   const [file, setFile] = useState<Blob | null>()
   const [cropping, setCropping] = useState(false);
   const [slideValue, setSlideValue] = useState([10]);
@@ -25,16 +25,15 @@ const AvatarSettings = () => {
   const { toast } = useToast();
 
   const convertToFormData = () => {
-    const formData = new FormData();
     if (file !== null && file !== undefined) {
       const formData = new FormData();
       formData.append("file", file);
       return formData;
     } else {
-      return null; 
+      return null;
     }
   };
-  
+
   const dispatch = useDispatch();
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
   const headers = {
@@ -43,23 +42,23 @@ const AvatarSettings = () => {
   const onSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
     const oldUserData = Object.assign({}, userData);
-    try{
+    try {
       const newPhoto = convertToFormData();
-      const { data } = await axios.patch(`${baseURL}/user/edit/photoProfile/${userData.userId}`, newPhoto, {headers})
+      const { data } = await axios.patch(`${baseURL}/user/edit/photoProfile/${userData.userId}`, newPhoto, { headers })
       oldUserData.photoProfile = data.photo_profile
       dispatch(setUserData(oldUserData))
       toast({
         title: "Profile photo updated successfully",
         duration: 2500,
       });
-    }catch(err){
+    } catch (err) {
       toast({
         title: "Update photo profile is failed",
         duration: 2500,
       });
     }
   }
-  
+
   useEffect(() => {
     if (userData?.photoProfile) {
       setPreview(userData.photoProfile)
@@ -87,13 +86,13 @@ const AvatarSettings = () => {
   };
 
   const handleCancelCropping = () => {
-    setPreview("") 
+    setPreview("")
     setSrc("")
     setCropping(false)
   }
 
   const deleteAvatar = () => {
-    setPreview("") 
+    setPreview("")
   }
 
   return (
@@ -144,7 +143,7 @@ const AvatarSettings = () => {
             />
           </div>
         </div>
-        {file ? <Button type="submit" className="mt-6">Update Avatar</Button>: null}
+        <Button type="submit" className="mt-6" disabled={!file}>Update Avatar</Button>
       </form>
     </>
   )

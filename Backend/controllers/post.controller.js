@@ -1,9 +1,8 @@
 import jwt_decode from "jwt-decode";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 import { prismaClient } from "../src/prisma-client.js";
 import fs from "fs";
 import path from "path";
-
 
 const createPost = async (req, res) => {
   const { authorId, title, content, published, category } = req.body;
@@ -33,6 +32,8 @@ const createPost = async (req, res) => {
       },
     });
     if (post) post.image = `${baseUrl}/${post.image}`;
+    if (post.author.photo_profile !== null)
+      post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(201).json(post);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -63,7 +64,8 @@ const getPosts = async (req, res) => {
     if (posts) {
       posts.forEach((post) => {
         post.image = `${baseUrl}/${post.image}`;
-        if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+        if (post.author.photo_profile !== null)
+          post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
       });
     }
 
@@ -75,8 +77,8 @@ const getPosts = async (req, res) => {
 
 const getProfilePosts = async (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const authHeader = req.get('Authorization');
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.get("Authorization");
+  const token = authHeader && authHeader.split(" ")[1];
   let authorId = parseInt(req.params.id);
   let posts;
   try {
@@ -100,7 +102,8 @@ const getProfilePosts = async (req, res) => {
       if (posts) {
         posts.forEach((post) => {
           post.image = `${baseUrl}/${post.image}`;
-          if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+          if (post.author.photo_profile !== null)
+            post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
         });
       }
 
@@ -143,7 +146,7 @@ const getProfilePosts = async (req, res) => {
           getPostProfile();
         }
       }
-    })
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -166,7 +169,8 @@ const getPost = async (req, res) => {
       },
     });
     post.image = `${baseUrl}/${post.image}`;
-    if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+    if (post.author.photo_profile !== null)
+      post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(200).json(post);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -210,6 +214,8 @@ const updatePost = async (req, res) => {
     );
     const imagePath = path.join("public", searchPost.image);
     post.image = `${baseUrl}/${post.image}`;
+    if (post.author.photo_profile !== null)
+      post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     if (searchPost.image) {
       if (file && post) {
         fs.unlink(imagePath, (err) => {
@@ -249,4 +255,11 @@ const deletePost = async (req, res) => {
   }
 };
 
-export { createPost, getPosts, getProfilePosts, getPost, updatePost, deletePost}
+export {
+  createPost,
+  getPosts,
+  getProfilePosts,
+  getPost,
+  updatePost,
+  deletePost,
+};

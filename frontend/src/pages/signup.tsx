@@ -95,6 +95,7 @@ const SignUp = () => {
     const file = e.target.files?.[0];
     if (file) setSrc(URL.createObjectURL(file));
     setCropping(true);
+    console.log(cropping);
   };
 
   const handleSave = async () => {
@@ -190,7 +191,7 @@ const SignUp = () => {
                   {inputData.map((item, index) => (
                     <div key={index} className="flex flex-col space-y-3">
                       <Label htmlFor="email" className="after:content-['*'] after:text-red-500">{item.label} </Label>
-                      {item.type !== "password"
+                      {item.type !== "password" && item.type !== "file"
                         ? <Input
                           type={item.type}
                           {...register(
@@ -225,6 +226,7 @@ const SignUp = () => {
                                 | "name"
                                 | "username"
                                 | "email"
+                                | "photo_profile"
                                 | "password"
                                 | "confirmPassword",
                                 { required: true }
@@ -273,13 +275,17 @@ const SignUp = () => {
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          : <>
-                            {!cropping
-                              ? <Avatar className="justify-self-center w-44 h-44">
-                                <AvatarImage src={preview} />
-                                <AvatarFallback className="text-5xl sm:text-7xl">A</AvatarFallback>
-                              </Avatar>
-                              : <>
+                          : <div className="">
+                            {preview &&
+                              <div className="grid">
+                                <Avatar className="justify-self-center w-44 h-44">
+                                  <AvatarImage src={preview} />
+                                  <AvatarFallback className="text-5xl sm:text-7xl">A</AvatarFallback>
+                                </Avatar>
+                              </div>
+                            }
+                            {cropping &&
+                              <div className="grid">
                                 <div className="justify-self-center">
                                   <AvatarEditor
                                     ref={cropRef}
@@ -293,22 +299,31 @@ const SignUp = () => {
                                     rotate={0}
                                   />
                                 </div>
-                                <div className="mt-3 flex flex-row justify-center gap-2">
-                                  <Slider max={100} step={1} name="slider" className="cursor-pointer" value={slideValue} onValueChange={(e) => setSlideValue(e)} />
+                                <div className="my-3 flex flex-row justify-center gap-2">
+                                  <Slider min={10} max={100} step={1} name="slider" className="cursor-pointer" value={slideValue} onValueChange={(e) => setSlideValue(e)} />
                                   <Button type="button" onClick={handleSave}>Crop</Button>
                                   <Button type="button" variant="outline" onClick={handleCancelCropping}>Cancel</Button>
                                 </div>
-                              </>
+                              </div>
                             }
-                            {preview && <Button type="button" className="mt-3" variant="destructive" onClick={deleteAvatar}>Remove Avatar</Button>}
+                            {preview && <Button type="button" className="my-3" variant="destructive" onClick={deleteAvatar}>Remove Avatar</Button>}
                             <Input
                               type={item.type}
                               id={item.id}
                               className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-all"
                               accept="image/*"
+                              {...register(
+                                item.id as
+                                | "name"
+                                | "username"
+                                | "email"
+                                | "photo_profile"
+                                | "password"
+                                | "confirmPassword",
+                              )}
                               onChange={handleImgChange}
                             />
-                          </>
+                          </div>
                       }
                       {item.error && <small className="text-red-500">{item.errorMessage}</small>}
                     </div>
