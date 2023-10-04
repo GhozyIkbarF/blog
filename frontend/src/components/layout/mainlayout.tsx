@@ -4,7 +4,7 @@ import axios from 'axios';
 import Navbar from '../section/navbar/navbar'
 import jwt_decode from "jwt-decode";
 import { useDispatch } from 'react-redux';
-import { setIsLogin, setUserData } from '@/Utlis';
+import { setIsLogin, setAccessToken, setUserData } from '@/Utlis';
 import { Toaster } from '../ui/toaster';
 
 interface token {
@@ -30,11 +30,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
       if (decode) {
         dispatch(setIsLogin(true));
+        dispatch(setAccessToken(res.data.accessToken));
         dispatch(setUserData({
           name: decode.name,
           username: decode.username,
           userEmail: decode.userEmail,
-          userId: decode.userId
+          userId: decode.userId,
+          photoProfile: res.data.photoProfile,
         }));
       }
     } catch (err) {

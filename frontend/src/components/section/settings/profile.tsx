@@ -60,16 +60,17 @@ const Profile = () => {
     'Content-Type': 'application/json',
   }
 
-  const onSubmit = async (data: Inputs) => {
+  const onSubmit = async (values: Inputs) => {
     const baseURL = process.env.NEXT_PUBLIC_API_CALL;
     try {
-      const res = await axios.patch(`${baseURL}/user/edit/${userData.userId}`, data, { headers })
-      if (res) {
+      const { data } = await axios.patch(`${baseURL}/user/edit/${userData.userId}`, values, { headers })
+  
         dispatch(setUserData({
-          name: res.data.name,
+          name: data.name,
           userId: userData.userId,
-          username: res.data.username,
-          userEmail: res.data.email,
+          username: data.username,
+          userEmail: data.email,
+          photoProfile: userData.photoProfile,
         }
         ))
         reset();
@@ -78,9 +79,8 @@ const Profile = () => {
           title: "Profile updated successfully!",
           duration: 2500,
         })
-      }
-    } catch (err) {
-      setError('password', { type: 'custom', message: 'Password is not correct' })
+    } catch (err: any) {
+      if(err.response.data.password) setError('password', { type: 'manual', message: 'Password is not correct' })
       toast({
         title: "Failed to update Profile",
         duration: 2500,
@@ -153,9 +153,7 @@ const Profile = () => {
               Password{" "}
             </Label>
             <Input type="password" id="password" {...register('password')} className="mt-2" placeholder="Enter your password" />
-            {errors.password
-              ? <small className="muted-text text-red-500 mt-1">{errors.password?.message}</small>
-              : <small className="muted-text mt-1">Enter your password to confirm changes.</small>}
+            {errors.password && <small className="muted-text text-red-500 mt-1">{errors.password?.message}</small>}
           </div>
         </div>
         <Button type="submit" className="mt-6">Update Profile</Button>

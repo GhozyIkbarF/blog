@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef, useState } from 'react'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import Title from '@/components/head'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -8,14 +8,64 @@ import { Slider } from "@/components/ui/slider"
 import AvatarEditor from "react-avatar-editor";
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { setUserData } from '@/Utlis'
+import { useToast } from '@/components/ui/use-toast'
 
 const AvatarSettings = () => {
   const { userData } = useSelector((state: RootState) => state.utils);
   const [src, setSrc] = useState("");
-  const [preview, setPreview] = useState(""); // value harusnya ambil dari foto di database
+  const [preview, setPreview] = useState(""); 
+  const [file, setFile] = useState<Blob | null>()
   const [cropping, setCropping] = useState(false);
   const [slideValue, setSlideValue] = useState([10]);
   const cropRef = useRef(null);
+
+  const { toast } = useToast();
+
+  const convertToFormData = () => {
+    const formData = new FormData();
+    if (file !== null && file !== undefined) {
+      const formData = new FormData();
+      formData.append("file", file);
+      return formData;
+    } else {
+      return null; 
+    }
+  };
+  
+  const dispatch = useDispatch();
+  const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+  const headers = {
+    "Content-Type": "multipart/form-data",
+  };
+  const onSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault()
+    const oldUserData = Object.assign({}, userData);
+    try{
+      const newPhoto = convertToFormData();
+      const { data } = await axios.patch(`${baseURL}/user/edit/photoProfile/${userData.userId}`, newPhoto, {headers})
+      oldUserData.photoProfile = data.photo_profile
+      dispatch(setUserData(oldUserData))
+      toast({
+        title: "Profile photo updated successfully",
+        duration: 2500,
+      });
+    }catch(err){
+      toast({
+        title: "Update photo profile is failed",
+        duration: 2500,
+      });
+    }
+  }
+  
+  useEffect(() => {
+    if (userData?.photoProfile) {
+      setPreview(userData.photoProfile)
+      setFile(null)
+    }
+  }, [userData])
 
   const handleImgChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -23,27 +73,27 @@ const AvatarSettings = () => {
     setCropping(true);
   };
 
+
   const handleSave = async () => {
-    if (cropRef) {
-      const dataUrl = cropRef.current?.getImage().toDataURL();
-      console.log(dataUrl);
+    if (cropRef.current) {
+      const dataUrl = cropRef.current.getImage().toDataURL();
       const result = await fetch(dataUrl);
       const blob = await result.blob();
+      const newfile = new File([blob], "file5645456.webp", { type: 'image/webp' });
       setPreview(URL.createObjectURL(blob));
+      setFile(newfile)
       setCropping(false);
     }
   };
 
   const handleCancelCropping = () => {
-    setPreview("") // set value kembali dari foto database
+    setPreview("") 
     setSrc("")
     setCropping(false)
-    // setValue("file", )
   }
 
   const deleteAvatar = () => {
-    setPreview("") // hapus foto dari database
-    // setValue("file", )
+    setPreview("") 
   }
 
   return (
@@ -55,7 +105,7 @@ const AvatarSettings = () => {
         This is how your avatar look like on the site.
       </small>
       <Separator className="my-6" />
-      <form>
+      <form onSubmit={onSubmit}>
         <div className="grid w-full items-center gap-5">
           <div className="grid">
             {!cropping
@@ -94,7 +144,7 @@ const AvatarSettings = () => {
             />
           </div>
         </div>
-        <Button type="submit" className="mt-6">Update Avatar</Button>
+        {file ? <Button type="submit" className="mt-6">Update Avatar</Button>: null}
       </form>
     </>
   )

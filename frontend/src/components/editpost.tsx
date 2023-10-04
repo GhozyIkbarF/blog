@@ -1,9 +1,9 @@
-import React, { use, useEffect } from "react";
-import { useState } from "react";
+import React, { useState, useEffect, ChangeEvent, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -33,13 +33,14 @@ import {
 } from "@/components/ui/popover";
 import {
   Globe,
-  Image as Img,
+  Image as ImageIcon,
   ChevronsUpDown,
   Check,
   Lock,
-  PenSquare,
   Pencil,
+  X 
 } from "lucide-react";
+import { DialogClose } from "@radix-ui/react-dialog";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -88,12 +89,16 @@ interface Inputs {
   content: string;
   published: boolean;
   category: string;
-  file: FileList;
+  file: FileList | string;
 }
 
-const EditPost = ({ className }: { className?: string }) => {
+const EditPost = ({ id, index, className }: { id?: number, index?: number, className?: string }) => {
   const [open, setOpen] = useState(false);
+  const myItemRef = useRef<HTMLButtonElement | null>(null);
   const { userData, posts } = useSelector((state: RootState) => state.utils);
+  const maxCharLength = 2500;
+  const [text, setText] = useState("");
+  const [previewImage, setPreviewImage] = useState("");
 
   // const btnClose: HTMLElement | null = document.getElementById('btn-close-dialog');
 
@@ -121,15 +126,10 @@ const EditPost = ({ className }: { className?: string }) => {
   const category = watch("category");
   const published = watch("published");
   const file = watch("file");
+  
 
   const { toast } = useToast();
-
-  useEffect(() => { }, [file]);
-
-  const headers = {
-    "Content-Type": "multipart/form-data",
-  };
-
+  
   const convertToFormData = (data: Inputs) => {
     const formData = new FormData();
     formData.append("authorId", userData.userId?.toString());
@@ -137,35 +137,37 @@ const EditPost = ({ className }: { className?: string }) => {
     formData.append("content", data.content);
     formData.append("category", data.category);
     formData.append("published", data.published.toString());
+    console.log(data.file[0]);
     formData.append("file", data.file[0]);
     return formData;
   };
 
+  const headers = {
+    "Content-Type": "multipart/form-data",
+  };
   const onSubmit = async (data: Inputs) => {
     const baseURL = process.env.NEXT_PUBLIC_API_CALL;
+    const postList= [...posts]
     try {
       const postData = convertToFormData(data);
-      const res = await axios.post(`${baseURL}/post`, postData, { headers });
-      console.log(res);
-      dispatch(setPosts([res.data, ...posts]))
+      const res = await axios.patch(`${baseURL}/post/edit/${id}`, postData, { headers });
+      postList[index!] = res.data
+      dispatch(setPosts(postList))
       reset();
+      if (myItemRef.current) myItemRef.current.click();
       toast({
-        title: "Create new post is success!",
+        title: "post updated successfully",
         duration: 2500,
       });
-      // btnClose?.click();
     } catch (err) {
       console.error(err);
       toast({
-        title: "Create new post is failed!",
+        title: "post failed to update",
         duration: 2500,
       });
     }
   };
-
-  // useEffect(() => {
-  //   if(!open) reset();
-  // },[open])
+  
   const handleSelectedCategory = (value: string) => {
     setValue("category", value);
     setOpen(false);
@@ -179,10 +181,40 @@ const EditPost = ({ className }: { className?: string }) => {
     handleSubmit(onSubmit);
   };
 
+  const handleEditPost = () => {
+    const post = posts[index!];
+    setValue("title", post.title);
+    setValue("content", post.content);
+    setValue("category", post.category);
+    setValue("published", post.published);
+    setValue("file", post.image);
+  }
+  
+  useEffect(() => {
+    if(typeof file !== 'string' && file?.length > 0){
+      setPreviewImage(URL.createObjectURL(file[0]))
+    }else{
+      setPreviewImage(file as string)
+    }
+  }, [file])
+  
+  const deletePreviewImage = () => {
+    setPreviewImage("")
+    setValue("file", "")
+  }
+
+  const handleText = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setText(event.target.value);
+  };
+
+  const countCharacters = (inputText: string) => {
+    return inputText.length;
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className={`ml-3 mt-3 rounded-full sm:ml-6 ${className}`} size="icon" variant="ghost">
+        <Button  type="button" className={`ml-6 mt-3 rounded-full ${className}`} size="icon" variant="ghost" onClick={handleEditPost}>
           <Pencil />
         </Button>
       </DialogTrigger>
@@ -203,13 +235,37 @@ const EditPost = ({ className }: { className?: string }) => {
               />
             </div>
             <div className="flex flex-col space-y-3">
-              <Label htmlFor="content">Paragraph</Label>
+              <div className="flex flex-row justify-between">
+                <Label htmlFor="content">Paragraph</Label>
+                <small
+                  className={`muted-text ${
+                    countCharacters(text) === 2500 ? "text-red-500" : ""
+                  }`}
+                >
+                  {countCharacters(text)} / {maxCharLength}
+                </small>
+              </div>
               <Textarea
                 className="min-h-[200px]"
                 {...register("content")}
+                onChange={handleText}
                 id="content"
                 placeholder="Write your mind here"
               />
+              </div>
+            <div className="flex flex-col space-y-3">
+              <Label htmlFor={"file"} className="flex flex-col gap-1 items-center justify-center cursor-pointer h-28 w-full text-muted-foreground rounded-md border-2 border-input border-dashed bg-background px-3 py-2 transition-colors hover:border-muted-foreground">
+                {previewImage !== ""
+                  ? <div className="relative h-full w-full">
+                    <Image src={previewImage} className="object-contain" alt="Preview image" fill={true} />
+                  </div>
+                  : <>
+                    <ImageIcon />
+                    Add an image
+                  </>
+                }
+              </Label>
+              {previewImage !== "" && <Button type="button" variant="destructive" onClick={deletePreviewImage}>Delete Image</Button>}
             </div>
           </div>
           <DialogFooter className="flex-col sm:justify-between">
@@ -303,6 +359,10 @@ const EditPost = ({ className }: { className?: string }) => {
             </Button>
           </DialogFooter>
         </form>
+        <DialogClose ref={myItemRef} className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogClose>
       </DialogContent>
     </Dialog >
   );

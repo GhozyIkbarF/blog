@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Title from '@/components/head'
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LOGIN } from '@/validation'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
+import { RootState } from "@/store";
 
 interface Inputs {
   email: string;
@@ -22,6 +24,7 @@ interface Inputs {
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const { isLogin } = useSelector((state: RootState) => state.utils);
   const router = useRouter();
 
   const {
@@ -29,6 +32,7 @@ const Login = () => {
     handleSubmit,
     reset,
     clearErrors,
+    setError,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: yupResolver(LOGIN),
@@ -57,14 +61,27 @@ const Login = () => {
       reset();
       clearErrors(["email", "password"]);
       router.push('/')
-    } catch (err) {
-      console.log(err)
-      toast({
-        title: "Sign Up Failed!",
-        duration: 5000,
-      })
+    } catch (err: any) {
+      if(err.response){
+        for(const error in err.response.data){
+         setError(error as 'email' | 'password', {
+            type: "manual",
+            message: err.response.data[error],
+          });
+        }
+        toast({
+          title: "Sign Up Failed!",
+          duration: 5000,
+        })
+      }
     }
   };
+
+  useEffect(() => {
+    if (isLogin) {
+      router.push('/')
+    }
+  },[isLogin])
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -98,10 +115,13 @@ const Login = () => {
                         },
                       })}
                     />
-                    {errors.email && <small className="text-red-500">{errors.email.message}</small>}
+                    {errors.email && <small className="text-red-500">{errors.email?.message}</small>}
                   </div>
                   <div className="flex flex-col space-y-3">
-                    <Label htmlFor="password" className="after:content-['*'] after:text-red-500">Password </Label>
+                    <div className='flex justify-between items-end p-0'>
+                      <Label htmlFor="password" className="after:content-['*'] after:text-red-500">Password </Label>
+                      <Link href="/forgot-password" className='text-xs'>Forgot Password?</Link>
+                    </div>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
@@ -130,7 +150,7 @@ const Login = () => {
                         </Tooltip>
                       </TooltipProvider>
                     </div>
-                    {errors.password && <small className="text-red-500">{errors.password.message}</small>}
+                    {errors.password && <small className="text-red-500">{errors.password?.message}</small>}
                   </div>
                 </div>
               </CardContent>

@@ -1,9 +1,11 @@
-import { log } from "console";
+import jwt_decode from "jwt-decode";
+import jwt from 'jsonwebtoken'
 import { prismaClient } from "../src/prisma-client.js";
 import fs from "fs";
 import path from "path";
 
-export const createPost = async (req, res) => {
+
+const createPost = async (req, res) => {
   const { authorId, title, content, published, category } = req.body;
   const baseUrl = `${req.protocol}://${req.get("host")}`;
   const file = req.file.path.split("\\").slice(1).join("\\");
@@ -37,7 +39,7 @@ export const createPost = async (req, res) => {
   }
 };
 
-export const getPosts = async (req, res) => {
+const getPosts = async (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
   try {
     const posts = await prismaClient.post.findMany({
@@ -61,6 +63,7 @@ export const getPosts = async (req, res) => {
     if (posts) {
       posts.forEach((post) => {
         post.image = `${baseUrl}/${post.image}`;
+        if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
       });
     }
 
@@ -70,38 +73,83 @@ export const getPosts = async (req, res) => {
   }
 };
 
-export const getProfilePosts = async (req, res) => {
+const getProfilePosts = async (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const authHeader = req.get('Authorization');
+  const token = authHeader && authHeader.split(' ')[1];
+  let authorId = parseInt(req.params.id);
+  let posts;
   try {
-    const posts = await prismaClient.post.findMany({
-      where: { authorId: parseInt(req.params.id) },
-      include: {
-        author: {
-          select: {
-            name: true,
-            username: true,
-            email: true,
-            photo_profile: true,
+    async function getPost() {
+      posts = await prismaClient.post.findMany({
+        where: { authorId: parseInt(req.params.id), published: true },
+        include: {
+          author: {
+            select: {
+              name: true,
+              username: true,
+              email: true,
+              photo_profile: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    if (posts) {
-      posts.forEach((post) => {
-        post.image = `${baseUrl}/${post.image}`;
+        orderBy: {
+          createdAt: "desc",
+        },
       });
-    }
+      if (posts) {
+        posts.forEach((post) => {
+          post.image = `${baseUrl}/${post.image}`;
+          if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+        });
+      }
 
-    res.status(200).json(posts);
+      res.status(200).json(posts);
+    }
+    async function getPostProfile() {
+      posts = await prismaClient.post.findMany({
+        where: { authorId: parseInt(req.params.id) },
+        include: {
+          author: {
+            select: {
+              name: true,
+              username: true,
+              email: true,
+              photo_profile: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+      if (posts) {
+        posts.forEach((post) => {
+          post.image = `${baseUrl}/${post.image}`;
+        });
+      }
+
+      res.status(200).json(posts);
+    }
+    if (token == null) getPost();
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+        getPost();
+      } else {
+        const decoded = jwt_decode(token);
+        if (decoded.userId != authorId) {
+          getPost();
+        } else {
+          getPostProfile();
+        }
+      }
+    })
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-export const getPost = async (req, res) => {
+const getPost = async (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
   try {
     const post = await prismaClient.post.findUnique({
@@ -118,19 +166,21 @@ export const getPost = async (req, res) => {
       },
     });
     post.image = `${baseUrl}/${post.image}`;
+    if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(200).json(post);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-export const updatePost = async (req, res) => {
+const updatePost = async (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const { authorId, title, image, content, published, category } = req.body;
-  console.log(req.file);
+  const { authorId, title, content, published, category } = req.body;
   const file = req.file?.path.split("\\").slice(1).join("\\");
   try {
     let updateData = { authorId, title, content, published, category };
+    updateData.authorId = parseInt(authorId);
+    updateData.published = JSON.parse(published);
     if (file) updateData.image = file;
     const [searchPost, post] = await prismaClient.$transaction(
       async (prisma) => {
@@ -144,6 +194,16 @@ export const updatePost = async (req, res) => {
         const post = await prisma.post.update({
           where: { id: parseInt(req.params.id) },
           data: updateData,
+          include: {
+            author: {
+              select: {
+                name: true,
+                username: true,
+                email: true,
+                photo_profile: true,
+              },
+            },
+          },
         });
         return [searchPost, post];
       }
@@ -158,23 +218,16 @@ export const updatePost = async (req, res) => {
               .status(500)
               .json({ error: "An error occurred while deleting the file." });
           }
-          return res.status(201).json({
-            data: post,
-            message: "post is successfully updated",
-          });
         });
       }
-      res.status(201).json({
-        data: post,
-        message: "post is successfully updated",
-      });
     }
+    res.status(201).json(post);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-export const deletePost = async (req, res) => {
+const deletePost = async (req, res) => {
   try {
     const post = await prismaClient.post.delete({
       where: { id: parseInt(req.params.id) },
@@ -195,3 +248,5 @@ export const deletePost = async (req, res) => {
     res.status().json({ message: err.message });
   }
 };
+
+export { createPost, getPosts, getProfilePosts, getPost, updatePost, deletePost}

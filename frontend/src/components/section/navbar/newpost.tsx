@@ -11,6 +11,7 @@ import { Globe, ChevronsUpDown, Check, Lock, PenSquare, Image as ImageIcon, X } 
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { CREATE_POST } from "@/validation";
 import { useToast } from "@/components/ui/use-toast";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -28,7 +29,7 @@ type modalProps = {
   modalTitle: string;
   modalButton: string;
   children: React.ReactNode;
-}
+};
 
 const categories: Categories[] = [
   {
@@ -66,7 +67,7 @@ const NewPost = () => {
   const myItemRef = useRef<HTMLButtonElement | null>(null);
   const maxCharLength = 2500;
   const [open, setOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("")
+  const [previewImage, setPreviewImage] = useState("");
   const [text, setText] = useState("");
   const { userData, posts } = useSelector((state: RootState) => state.utils);
 
@@ -80,12 +81,13 @@ const NewPost = () => {
     watch,
     formState: { errors },
   } = useForm<Inputs>({
-    // resolver: yupResolver(EDIT_PASSWORD),
+    resolver: yupResolver(CREATE_POST as any),
     defaultValues: {
       title: "",
       content: "",
       published: true,
       category: "",
+      file: "",
     },
   });
 
@@ -94,8 +96,6 @@ const NewPost = () => {
   const file = watch("file");
 
   const { toast } = useToast();
-
-  useEffect(() => { }, [file]);
 
   const headers = {
     "Content-Type": "multipart/form-data",
@@ -107,8 +107,10 @@ const NewPost = () => {
     formData.append("title", data.title);
     formData.append("content", data.content);
     formData.append("category", data.category);
-    formData.append("published", data.published.toString());
-    formData.append("file", data.file[0]);
+    formData.append("published", data.published ? "true" : "false");
+    if (data.file.length > 0) {
+      formData.append("file", data.file[0]);
+    }
     return formData;
   };
 
@@ -117,15 +119,12 @@ const NewPost = () => {
     try {
       const postData = convertToFormData(data);
       const res = await axios.post(`${baseURL}/post`, postData, { headers });
-      dispatch(setPosts([res.data, ...posts]))
-      reset();
+      dispatch(setPosts([res.data, ...posts]));
+      onClosed()
       toast({
         title: "Create new post is success!",
         duration: 2500,
       });
-      setText("")
-      setPreviewImage("")
-      setValue("file", "")
       if (myItemRef.current) myItemRef.current.click();
     } catch (err) {
       console.error(err);
@@ -149,15 +148,18 @@ const NewPost = () => {
     handleSubmit(onSubmit);
   };
 
-  const getPreviewImage = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) setPreviewImage(URL.createObjectURL(file))
-  }
+
+  useEffect(() => {
+    if (typeof file !== "string" && file?.length > 0) {
+      setPreviewImage(URL.createObjectURL(file[0]));
+    }
+  }, [file]);
+
 
   const deletePreviewImage = () => {
-    setPreviewImage("")
-    setValue("file", "")
-  }
+    setPreviewImage("");
+    setValue("file", "");
+  };
 
   const handleText = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
@@ -166,6 +168,14 @@ const NewPost = () => {
   const countCharacters = (inputText: string) => {
     return inputText.length;
   };
+
+  const onClosed = () => {
+    clearErrors(["title", "category", "content", "published", "file"]);
+    reset()
+    setText("")
+    setPreviewImage("")
+    setValue("file", "")
+  }
 
   return (
     <Dialog>
@@ -190,13 +200,18 @@ const NewPost = () => {
                 id="title"
                 placeholder="Summarize your thoughts"
               />
+              {errors.title && <small className="text-red-500">{errors.title?.message}</small>}
             </div>
             <div className="flex flex-col space-y-3">
               <div className="flex flex-row justify-between">
                 <Label htmlFor="content">Paragraph</Label>
-                {countCharacters(text) < 2500
-                  ? <small className="muted-text">{countCharacters(text)} / {maxCharLength}</small>
-                  : <small className="muted-text text-red-500">{countCharacters(text)} / {maxCharLength}</small>}
+                <small
+                  className={`muted-text ${
+                    countCharacters(text) === 2500 ? "text-red-500" : ""
+                  }`}
+                >
+                  {countCharacters(text)} / {maxCharLength}
+                </small>
               </div>
               <Textarea
                 className="min-h-[200px]"
@@ -207,20 +222,38 @@ const NewPost = () => {
                 onChange={handleText}
                 placeholder="Write your mind here"
               />
+              {errors.content && <small className="text-red-500">{errors.content?.message}</small>}
             </div>
             <div className="flex flex-col space-y-3">
-              <Label htmlFor={"file"} className="flex flex-col gap-1 items-center justify-center cursor-pointer h-28 w-full text-muted-foreground rounded-md border-2 border-input border-dashed bg-background px-3 py-2 transition-colors hover:border-muted-foreground">
-                {previewImage !== ""
-                  ? <div className="relative h-full w-full">
-                    <Image src={previewImage} className="object-contain" alt="Preview image" fill={true} />
+              <Label
+                htmlFor={"file"}
+                className="flex flex-col gap-1 items-center justify-center cursor-pointer h-28 w-full text-muted-foreground rounded-md border-2 border-input border-dashed bg-background px-3 py-2 transition-colors hover:border-muted-foreground"
+              >
+                {previewImage !== "" ? (
+                  <div className="relative h-full w-full">
+                    <Image
+                      src={previewImage}
+                      className="object-contain"
+                      alt="Preview image"
+                      fill={true}
+                    />
                   </div>
-                  : <>
+                ) : (
+                  <>
                     <ImageIcon />
                     Add an image
                   </>
-                }
+                )}
               </Label>
-              {previewImage !== "" && <Button type="button" variant="destructive" onClick={deletePreviewImage}>Delete Image</Button>}
+              {previewImage !== "" && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={deletePreviewImage}
+                >
+                  Delete Image
+                </Button>
+              )}
             </div>
           </div>
           <DialogFooter className="flex-col gap-3 sm:justify-between">
@@ -238,29 +271,33 @@ const NewPost = () => {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {published ? (
-                      <p className="text-sm">Everybody can see your post</p>
-                    ) : (
-                      <p className="text-sm">Only you can see your post</p>
-                    )}
+                    <p>
+                      {published
+                        ? "Everybody can see your post"
+                        : "Only you can see your post"}
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-[200px] justify-between"
-                  >
-                    {category
-                      ? categories.find((item) => item.value === category)
-                        ?.label
-                      : "Category..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
+                  <div className="flex flex-col items-start gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-[200px] justify-between"
+                    >
+                      {category
+                        ? categories.find((item) => item.value === category)
+
+                          ?.label
+                        : "Category..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                {errors.category && <small className="text-red-500">{errors.category?.message}</small>}
+                  </div>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0">
                   <Command>
@@ -293,20 +330,18 @@ const NewPost = () => {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div>
+                    <div className="flex flex-col items-start">
                       <Input
                         {...register("file")}
                         type="file"
                         id="file"
                         className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-all"
                         accept="image/*"
-                        onChange={getPreviewImage}
                       />
+                      {errors.file && <small className="text-red-500">{errors.file?.message}</small>}
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent>
-                    Add an image
-                  </TooltipContent>
+                  <TooltipContent>Add an image</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
@@ -315,12 +350,16 @@ const NewPost = () => {
             </Button>
           </DialogFooter>
         </form>
-        <DialogClose ref={myItemRef} className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <DialogClose 
+          ref={myItemRef} 
+          onClick={() => onClosed()} 
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+        >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogClose>
       </DialogContent>
-    </Dialog >
+    </Dialog>
   );
 };
 

@@ -2,12 +2,11 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Button } from "@/components/ui/button"
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card"
-import { Eye, Trash2, Pencil, MoreHorizontal, Globe, Lock } from "lucide-react"
+import { Eye, Trash2, Globe, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import NewPost from '../navbar/newpost'
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setPosts } from "@/Utlis";
@@ -25,17 +24,20 @@ const ProfilePosts = () => {
   const myItemRef = useRef<HTMLButtonElement | null>(null);
 
   // const [profilePosts, setProfilePosts] = useState([])
-  const [isLoading, setLoading] = useState(true);
-  const { posts, userData } = useSelector((state: RootState) => state.utils);
+  const [isLoading, setLoading] = useState<Boolean>(true);
+  const { posts, userData, accessToken } = useSelector((state: RootState) => state.utils);
 
   const { toast } = useToast();
 
   const dispatch = useDispatch();
+  const headers = {
+    'authorization': `Bearer ${accessToken}`,
+  }
 
   const getProfilePosts = async () => {
     setLoading(true)
     try {
-      const res = await axios.get(`${baseURL}/profileposts/${id}`);
+      const res = await axios.get(`${baseURL}/profileposts/${id}`, {headers});
       dispatch(setPosts(res.data))
     } catch (err) {
       console.log(err)
@@ -62,7 +64,6 @@ const ProfilePosts = () => {
         duration: 2500,
       })
     } catch (err) {
-      console.log(err)
       toast({
         title: "Failed to delete post!",
         duration: 2500,
@@ -96,7 +97,7 @@ const ProfilePosts = () => {
               </TooltipProvider>
               {id === userData?.userId &&
                 <>
-                  <EditPost />
+                  <EditPost id={post.id} index={index} />
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button className="ml-3 mt-3 mb-3 rounded-full sm:ml-6 sm:mb-6" size="icon" variant="ghost">

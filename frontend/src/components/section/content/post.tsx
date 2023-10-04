@@ -12,10 +12,17 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setPosts } from "@/Utlis";
 import { RootState } from "@/store";
+import { io } from "socket.io-client";
 import PostLoad from "@/components/skeleton/postload";
 
 const Post = () => {
 
+  // const socket = io('http://localhost/8080')
+  // socket.emit('post', 'new post')
+  // socket.on("post", (data) => {
+  //   dispatch(setPosts(data));
+  // });
+  
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
 
   const [isLoading, setLoading] = useState<Boolean>(true);
