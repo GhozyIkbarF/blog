@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { setPosts } from "@/Utlis";
 import { RootState } from "@/store";
 import { io } from "socket.io-client";
+import PostLoad from "@/components/skeleton/postload";
 
 const Post = () => {
 
@@ -34,13 +35,12 @@ const Post = () => {
     fetch(`${baseURL}/posts`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         dispatch(setPosts(data));
         setLoading(false);
       });
   }, [baseURL, dispatch]);
 
-  if (isLoading) return <p className="text-center mt-10">Loading...</p>;
+  if (isLoading) return <PostLoad />;
   if (!posts) return <p className="text-center" >No post data</p>;
 
   return (
@@ -74,7 +74,7 @@ const Post = () => {
               </CardHeader>
               <CardContent className="px-3 pb-3 sm:pt-0 sm:pb-6">
                 <CardTitle className="line-clamp-1 hover:underline cursor-pointer" onClick={() => router.push(`/post/${post.id}`)}>{post.title}</CardTitle>
-                {post.category && <Badge className="mt-3 cursor-default">{post.category.replace(/\b\w/g, l => l.toUpperCase())}</Badge>}
+                {post.category && <Badge className="mt-3 cursor-default">{(post.category as string).replace(/\b\w/g, l => l.toUpperCase())}</Badge>}
                 <p className="line-clamp-3">{post.content}</p>
               </CardContent>
             </div>

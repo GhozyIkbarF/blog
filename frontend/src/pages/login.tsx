@@ -118,9 +118,9 @@ const Login = () => {
                     {errors.email && <small className="text-red-500">{errors.email?.message}</small>}
                   </div>
                   <div className="flex flex-col space-y-3">
-                    <div className='flex justify-between items-end'>
+                    <div className='flex justify-between items-end p-0'>
                       <Label htmlFor="password" className="after:content-['*'] after:text-red-500">Password </Label>
-                      <Link href="/forgot-password" className='text-sm'>Forgot Password?</Link>
+                      <Link href="/forgot-password" className='text-xs'>Forgot Password?</Link>
                     </div>
                     <div className="relative">
                       <Input

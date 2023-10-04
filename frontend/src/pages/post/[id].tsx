@@ -29,6 +29,7 @@ import { useDispatch } from "react-redux";
 import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import DetailPostLoad from "@/components/skeleton/detailpostload";
 
 interface DetailedPost {
   author: {
@@ -52,6 +53,7 @@ interface DetailedPost {
 const DetailedPost = () => {
   const { userData, posts } = useSelector((state: RootState) => state.utils);
   const myItemRef = useRef<HTMLButtonElement | null>(null);
+  const [isLoading, setLoading] = useState(true);
   
   const router = useRouter();
   const id: number | undefined = parseInt(router.query.id as string);
@@ -61,11 +63,14 @@ const DetailedPost = () => {
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
 
   const getDetailPost = async (id: number) => {
+    setLoading(true)
     try {
       const res = await axios.get(`${baseURL}/post/${id}`);
       dispatch(setPosts([res.data]));
     } catch (err) {
       return router.push("/404")
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -91,6 +96,8 @@ const DetailedPost = () => {
       })
     }
   }
+
+  if (isLoading) return <DetailPostLoad />;
 
   return (
     <>

@@ -178,14 +178,14 @@ const NewPost = () => {
   }
 
   return (
-    <Dialog >
+    <Dialog>
       <DialogTrigger asChild>
         <Button type="button" className="px-2 font-bold sm:px-4">
           <PenSquare className="sm:mr-2" />
           <span className="hidden sm:inline-block">New Post</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl overflow-y-auto">
+      <DialogContent className="max-w-4xl">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>New Post</DialogTitle>

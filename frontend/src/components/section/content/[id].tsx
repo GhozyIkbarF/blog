@@ -2,20 +2,20 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Button } from "@/components/ui/button"
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card"
-import { Eye, Trash2, Pencil, MoreHorizontal, Globe, Lock } from "lucide-react"
+import { Eye, Trash2, Globe, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import NewPost from '../newpost'
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { setPosts } from "@/Utlis";
 import { RootState } from "@/store";
 import { createdAt } from "@/Utlis/date";
-import EditPost from '../editpost'
+import EditPost from '../../editpost'
 import axios from 'axios'
 import { useToast } from "@/components/ui/use-toast"
+import ProfilePostLoad from '@/components/skeleton/profilepostload'
 
 const ProfilePosts = () => {
   const router = useRouter()
@@ -64,7 +64,6 @@ const ProfilePosts = () => {
         duration: 2500,
       })
     } catch (err) {
-      console.log(err)
       toast({
         title: "Failed to delete post!",
         duration: 2500,
@@ -72,7 +71,7 @@ const ProfilePosts = () => {
     }
   }
 
-  if (isLoading) return <p className="text-center mt-10">Loading...</p>;
+  if (isLoading) return <ProfilePostLoad />;
 
   return (
     <article className="flex flex-col">

@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -28,10 +28,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { RootState } from "@/store";
 import { useDispatch } from "react-redux";
 import { setIsLogin, setUserData } from "@/Utlis";
-import { set } from "react-hook-form";
 
 const AvatarProfile = () => {
-  const [open, setOpen] = useState(false);
+  const myItemRef = useRef<HTMLButtonElement | null>(null);
   const { userData } = useSelector((state: RootState) => state.utils);
   const [data, setData] = useState(userData);
   const router = useRouter();
@@ -49,6 +48,7 @@ const AvatarProfile = () => {
         duration: 2500,
       });
       if (res) {
+        if (myItemRef.current) myItemRef.current.click();
         router.push("/");
         dispatch(setIsLogin(false));
         dispatch(setUserData({
@@ -58,7 +58,6 @@ const AvatarProfile = () => {
           username: "",
           photoProfile: "",
         }))
-        setOpen(false);
       }
     } catch (err) {
       console.error(err);
@@ -90,13 +89,13 @@ const AvatarProfile = () => {
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/settings/profile")}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/settings/avatar")}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <AlertDialog open={open} onOpenChange={() => setOpen(true)}>
+          <AlertDialog>
             <AlertDialogTrigger asChild className="px-2 py-1.5">
               <Button className="w-full justify-start text-red-500 hover:text-red-500" variant="ghost" size="sm">
                 <LogOut className="mr-2 h-4 w-4 text-red-500" /> Log Out
@@ -111,7 +110,7 @@ const AvatarProfile = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel ref={myItemRef}>Cancel</AlertDialogCancel>
                 <Button variant="destructive" className="w-1/2 sm:w-auto" onClick={() => logout()}>
                   Log Out
                 </Button>
