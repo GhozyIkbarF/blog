@@ -7,6 +7,7 @@ import {
   getPost,
   updatePost,
   deletePost,
+  searchPosts
 } from "../controllers/post.controller.js";
 import { upload } from "../helpers/uploadImage.js";
 
@@ -22,5 +23,6 @@ post_router.get("/profileposts/:id", getProfilePosts);
 post_router.get("/post/:id", getPost);
 post_router.patch("/post/edit/:id", upload.single("file"), updatePost);
 post_router.delete("/post/delete/:id", deletePost);
+post_router.get("/search-post", searchPosts)
 
 export default post_router;

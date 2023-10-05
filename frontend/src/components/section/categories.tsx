@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 const categories = [
   {
-    value: "all",
+    value: "",
     label: "All",
   },
   {
@@ -29,11 +29,20 @@ const categories = [
   },
 ]
 
-const Categories = ({ className }: { className?: string }) => {
+type CategoriesProps = {
+  className?: string,
+  onClick: (param: string) => void
+}
+
+const Categories = ({ className, onClick }: CategoriesProps) => {
+  const handleChangeCategory = (param: string) => {
+    onClick(param)
+  }
+
   return (
     <div className={`flex gap-2 overflow-x-auto ${className}`}>
       {categories.map((category, index) => (
-        <Toggle key={index} variant="outline" aria-label="Toggle category" className="border-dashed">
+        <Toggle key={index} variant="outline" aria-label="Toggle category" className="border-dashed" onClick={() => handleChangeCategory(category.value)}>
           {category.label}
         </Toggle>
       ))}

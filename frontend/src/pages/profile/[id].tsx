@@ -12,6 +12,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import axios from 'axios'
 import ProfileLoad from '@/components/skeleton/profileload'
+import { useDebounce } from 'use-debounce'
+import { setPosts } from '@/Utlis'
+import { useDispatch } from 'react-redux'
 
 interface DetailedProfile {
   name: string;
@@ -24,11 +27,14 @@ const Profile = () => {
   const router = useRouter()
   const id: number | undefined = parseInt(router.query.id as string);
   const [detailProfile, setDetailProfile] = useState<DetailedProfile>();
-  const { userData } = useSelector((state: RootState) => state.utils);
+  const [category, setCategory] = useState<string>("");
+  const { userData, accessToken } = useSelector((state: RootState) => state.utils);
   const [isLoading, setLoading] = useState(true);
+  const [categoryValue] = useDebounce(category, 1000);
+  
+  const dispatch = useDispatch();
 
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
-
   const getDetailProfile = async (id: number) => {
     setLoading(true)
     try {
@@ -45,6 +51,24 @@ const Profile = () => {
     if (!id) return;
     getDetailProfile(id);
   }, [id]);
+  
+  const handleSearch = async () => {
+    const { data } = await axios.get(`${baseURL}/search-post`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      params: {
+        id: id,
+        category: categoryValue
+      }
+    });
+    dispatch(setPosts(data))
+  };
+
+  useEffect(() => { 
+    if (!id || isLoading) return;
+    handleSearch() 
+  }, [categoryValue])
 
   if (isLoading) return <ProfileLoad />;
 
@@ -89,7 +113,7 @@ const Profile = () => {
                 </div>
               </CardHeader>
             </div>
-            <Categories className="p-6 sm:justify-center" />
+            <Categories className="p-6 sm:justify-center" onClick={setCategory}/>
             <ProfilePosts />
           </section>
         </Card>

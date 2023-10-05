@@ -83,9 +83,9 @@ const updatePhotoProfile = async (req, res) => {
         photo_profile: true,
       },
     });
-    const photoProfilePath = path.join("public", user.photo_profile);
     updatedPhotoProfile.photo_profile = `${baseUrl}/${updatedPhotoProfile.photo_profile}`;
     if (user.photo_profile) {
+      const photoProfilePath = path.join("public", user.photo_profile);
       if (file && updatedPhotoProfile) {
         fs.unlink(photoProfilePath, (err) => {
           if (err) {

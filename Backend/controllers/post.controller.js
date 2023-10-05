@@ -5,6 +5,13 @@ import fs from "fs";
 import path from "path";
 
 
+const selectAuthor = {
+  name: true,
+  username: true,
+  email: true,
+  photo_profile: true,
+}
+
 const createPost = async (req, res) => {
   const { authorId, title, content, published, category } = req.body;
   const baseUrl = `${req.protocol}://${req.get("host")}`;
@@ -23,16 +30,12 @@ const createPost = async (req, res) => {
       },
       include: {
         author: {
-          select: {
-            name: true,
-            username: true,
-            email: true,
-            photo_profile: true,
-          },
+          select: selectAuthor
         },
       },
     });
     if (post) post.image = `${baseUrl}/${post.image}`;
+    if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(201).json(post);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -48,12 +51,7 @@ const getPosts = async (req, res) => {
       },
       include: {
         author: {
-          select: {
-            name: true,
-            username: true,
-            email: true,
-            photo_profile: true,
-          },
+          select: selectAuthor
         },
       },
       orderBy: {
@@ -63,7 +61,57 @@ const getPosts = async (req, res) => {
     if (posts) {
       posts.forEach((post) => {
         post.image = `${baseUrl}/${post.image}`;
-        if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+        if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+      });
+    }
+
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+const searchPosts = async (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const authHeader = req.get('Authorization');
+  const token = authHeader && authHeader.split(' ')[1];
+  const whereCondition = {};
+
+  if (token == null) {
+    whereCondition.published = true;
+    whereCondition.title = { contains: req.query.search };
+  } else jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      res.status(401).json({ message: "Unauthorized" });
+    } else {
+      const decoded = jwt_decode(token);
+      if (parseInt(decoded.userId) != parseInt(req.query.id)) {
+        whereCondition.published = true;
+        whereCondition.authorId = parseInt(req.query.id);
+      } else whereCondition.authorId = parseInt(req.query.id);
+    }
+  })
+
+  try {
+    if (req.query.category?.length > 0) {
+      whereCondition.category = { equals: req.query.category };
+    }
+    const posts = await prismaClient.post.findMany({
+      where: whereCondition,
+      include: {
+        author: {
+          select: selectAuthor
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    if (posts) {
+      posts.forEach((post) => {
+        post.image = `${baseUrl}/${post.image}`;
+        if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
       });
     }
 
@@ -78,72 +126,38 @@ const getProfilePosts = async (req, res) => {
   const authHeader = req.get('Authorization');
   const token = authHeader && authHeader.split(' ')[1];
   let authorId = parseInt(req.params.id);
-  let posts;
+  const whereCondition = { authorId: parseInt(req.params.id) }
   try {
-    async function getPost() {
-      posts = await prismaClient.post.findMany({
-        where: { authorId: parseInt(req.params.id), published: true },
-        include: {
-          author: {
-            select: {
-              name: true,
-              username: true,
-              email: true,
-              photo_profile: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-      if (posts) {
-        posts.forEach((post) => {
-          post.image = `${baseUrl}/${post.image}`;
-          if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
-        });
-      }
-
-      res.status(200).json(posts);
-    }
-    async function getPostProfile() {
-      posts = await prismaClient.post.findMany({
-        where: { authorId: parseInt(req.params.id) },
-        include: {
-          author: {
-            select: {
-              name: true,
-              username: true,
-              email: true,
-              photo_profile: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-      if (posts) {
-        posts.forEach((post) => {
-          post.image = `${baseUrl}/${post.image}`;
-        });
-      }
-
-      res.status(200).json(posts);
-    }
     if (token == null) getPost();
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
       if (err) {
-        getPost();
+        whereCondition.published = true;
       } else {
         const decoded = jwt_decode(token);
         if (decoded.userId != authorId) {
-          getPost();
+          whereCondition.published = true;
         } else {
-          getPostProfile();
         }
       }
     })
+    const posts = await prismaClient.post.findMany({
+      where: whereCondition,
+      include: {
+        author: {
+          select: selectAuthor
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    if (posts) {
+      posts.forEach((post) => {
+        post.image = `${baseUrl}/${post.image}`;
+      });
+    }
+
+    res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -156,17 +170,12 @@ const getPost = async (req, res) => {
       where: { id: parseInt(req.params.id) },
       include: {
         author: {
-          select: {
-            name: true,
-            username: true,
-            email: true,
-            photo_profile: true,
-          },
+          select: selectAuthor
         },
       },
     });
     post.image = `${baseUrl}/${post.image}`;
-    if(post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+    if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(200).json(post);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -210,6 +219,7 @@ const updatePost = async (req, res) => {
     );
     const imagePath = path.join("public", searchPost.image);
     post.image = `${baseUrl}/${post.image}`;
+    if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     if (searchPost.image) {
       if (file && post) {
         fs.unlink(imagePath, (err) => {
@@ -249,4 +259,4 @@ const deletePost = async (req, res) => {
   }
 };
 
-export { createPost, getPosts, getProfilePosts, getPost, updatePost, deletePost}
+export { createPost, getPosts, searchPosts, getProfilePosts, getPost, updatePost, deletePost }

@@ -38,7 +38,7 @@ const Post = () => {
         dispatch(setPosts(data));
         setLoading(false);
       });
-  }, [baseURL, dispatch]);
+  }, []);
 
   if (isLoading) return <PostLoad />;
   if (!posts) return <p className="text-center" >No post data</p>;

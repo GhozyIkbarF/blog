@@ -191,9 +191,10 @@ const forgotPassword = async (req, res) => {
         expiresIn: 5 * 60,
       }
     );
-    const url = `${req.protocol}://${req.get("host")}/reset-password/${token}`;
+    // const url = `${req.protocol}://${req.get("host")}/reset-password/${token}`;
+    const url = `http://localhost:3000/reset-password/${token}`;
     const text = `Click this link to reset your password: ${url}`;
-    // await sendEmail(email, "Reset Password", text);
+    await sendEmail(email, "Reset Password", text);
     // res.json({ message: "Email sent" });
     res.json(url);
   }catch(err){
@@ -201,7 +202,7 @@ const forgotPassword = async (req, res) => {
   }
 }
 
-const sendEmail = async (req, res) => {
+const sendEmail = async (email, subject, text) => {
   try {
       const transporter = nodemailer.createTransport({
           host: process.env.HOST,
