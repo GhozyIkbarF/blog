@@ -17,7 +17,7 @@ const AvatarSettings = () => {
   const { userData } = useSelector((state: RootState) => state.utils);
   const [src, setSrc] = useState("");
   const [preview, setPreview] = useState("");
-  const [file, setFile] = useState<Blob | null>()
+  const [file, setFile] = useState<Blob | string>("")
   const [cropping, setCropping] = useState(false);
   const [slideValue, setSlideValue] = useState([10]);
   const cropRef = useRef(null);
@@ -25,13 +25,11 @@ const AvatarSettings = () => {
   const { toast } = useToast();
 
   const convertToFormData = () => {
-    if (file !== null && file !== undefined) {
-      const formData = new FormData();
+    const formData = new FormData();
+    if (file !== null && file !== undefined && file !== "") {
       formData.append("file", file);
-      return formData;
-    } else {
-      return null;
     }
+    return formData
   };
 
   const dispatch = useDispatch();
@@ -58,11 +56,12 @@ const AvatarSettings = () => {
       });
     }
   }
-
+  console.log(userData?.photoProfile);
+  
   useEffect(() => {
     if (userData?.photoProfile) {
       setPreview(userData.photoProfile)
-      setFile(null)
+      setFile("")
     }
   }, [userData])
 
@@ -93,6 +92,7 @@ const AvatarSettings = () => {
 
   const deleteAvatar = () => {
     setPreview("")
+    setFile("")
   }
 
   return (
@@ -143,7 +143,7 @@ const AvatarSettings = () => {
             />
           </div>
         </div>
-        <Button type="submit" className="mt-6" disabled={!file}>Update Avatar</Button>
+        <Button type="submit" className="mt-6" disabled={!preview}>Update Avatar</Button>
       </form>
     </>
   )

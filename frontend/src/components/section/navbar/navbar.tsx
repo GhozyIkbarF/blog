@@ -10,7 +10,7 @@ import { Moon, Sun } from 'lucide-react'
 import NewPost from './newpost'
 import AvatarProfile from './avatarprofile'
 import LoginBtn from './loginbtn';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/store'
 
 const Navbar = () => {

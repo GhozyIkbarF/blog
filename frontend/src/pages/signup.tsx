@@ -22,7 +22,7 @@ interface Inputs {
   name: string;
   username: string;
   email: string;
-  photo_profile?: null | string;
+  photo_profile?: File | string;
   password: string;
   confirmPassword: string;
 }
@@ -40,6 +40,7 @@ const SignUp = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     reset,
     clearErrors,
     formState: { errors },
@@ -49,7 +50,7 @@ const SignUp = () => {
       name: "",
       username: "",
       email: "",
-      photo_profile: "",
+      // photo_profile: "",
       password: "",
       confirmPassword: "",
     },
@@ -63,17 +64,16 @@ const SignUp = () => {
   const { toast } = useToast();
   const onSubmit = async (data: Inputs) => {
     console.log(data);
-
     try {
-      const res = await axios.post(`${baseURL}/register`, data, { headers });
+      // const res = await axios.post(`${baseURL}/register`, data, { headers });
+      // reset();
+      // console.log(res);
+      // clearErrors(["name", "username", "email", "photo_profile", "password", "confirmPassword"]);
+      // router.push('/login')
       toast({
         title: "Sign Up Success!",
         duration: 2500,
       })
-      reset();
-      console.log(res);
-      clearErrors(["name", "username", "email", "photo_profile", "password", "confirmPassword"]);
-      router.push('/login')
     } catch (err) {
       console.log(err);
       toast({
@@ -83,12 +83,9 @@ const SignUp = () => {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
+  const togglePasswordVisibility = (param: string) => {
+    if(param === 'password') setShowPassword(!showPassword);
+    else setShowConfirmPassword(!showConfirmPassword); 
   };
 
   const handleImgChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -104,20 +101,21 @@ const SignUp = () => {
       console.log(dataUrl);
       const result = await fetch(dataUrl);
       const blob = await result.blob();
+      const newfile = new File([blob], "file5645456.webp", { type: 'image/webp' });
       setPreview(URL.createObjectURL(blob));
+      setValue("photo_profile", newfile)
       setCropping(false);
     }
   };
 
   const handleCancelCropping = () => {
-    setPreview("") // set value kembali dari foto database
+    setPreview("")
     setSrc("")
     setCropping(false)
-    // setValue("file", )
   }
 
   const deleteAvatar = () => {
-    setPreview("") // hapus foto dari database
+    setPreview("") 
     // setValue("file", )
   }
 
@@ -226,7 +224,7 @@ const SignUp = () => {
                                 | "name"
                                 | "username"
                                 | "email"
-                                | "photo_profile"
+                                // | "photo_profile"
                                 | "password"
                                 | "confirmPassword",
                                 { required: true }
@@ -237,10 +235,10 @@ const SignUp = () => {
                                 <TooltipTrigger asChild>
                                   <Button
                                     type="button"
-                                    onClick={
+                                    onClick={() =>
                                       item.id === "password"
-                                        ? togglePasswordVisibility
-                                        : toggleConfirmPasswordVisibility
+                                        ? togglePasswordVisibility('password')
+                                        : togglePasswordVisibility('confirmPassword')
                                     }
                                     className="absolute top-0.5 right-0.5 text-muted-foreground cursor-pointer hover:bg-transparent"
                                     variant="ghost"
@@ -317,7 +315,7 @@ const SignUp = () => {
                                 | "name"
                                 | "username"
                                 | "email"
-                                | "photo_profile"
+                                // | "photo_profile"
                                 | "password"
                                 | "confirmPassword",
                               )}

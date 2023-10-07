@@ -23,6 +23,7 @@ interface UserData {
 }
 
 interface StateSlice {
+  utils: any;
   userData: UserData | null;
   isLogin: boolean;
   accessToken: string;
@@ -31,6 +32,7 @@ interface StateSlice {
 }
 
 const initialState: StateSlice = {
+  utils: null,
   userData: null,
   isLogin: false,
   accessToken: "",

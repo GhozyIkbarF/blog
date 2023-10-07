@@ -20,7 +20,6 @@ const register = async (req, res) => {
       "Content-Type": "application/json",
     });
     res.status(201).json({
-      data: user,
       message: "Create user is successfully created",
     });
   } catch (err) {
@@ -165,7 +164,8 @@ const refreshToken = async (req, res) => {
           maxAge: 24 * 60 * 60 * 1000,
           // secure: true //untuk htpps
         });
-        if(token.user.photo_profile !== null) token.user.photo_profile = `${baseUrl}/${token.user.photo_profile}`;
+        console.log(token.user.photo_profile);
+        if(token.user.photo_profile.length > 0) token.user.photo_profile = `${baseUrl}/${token.user.photo_profile}`;
         res.json({
           photoProfile: token.user.photo_profile,
           accessToken: accessToken,
@@ -191,9 +191,10 @@ const forgotPassword = async (req, res) => {
         expiresIn: 5 * 60,
       }
     );
-    const url = `${req.protocol}://${req.get("host")}/reset-password/${token}`;
+    // const url = `${req.protocol}://${req.get("host")}/reset-password/${token}`;
+    const url = `http://localhost:3000/reset-password/${token}`;
     const text = `Click this link to reset your password: ${url}`;
-    // await sendEmail(email, "Reset Password", text);
+    await sendEmail(email, "Reset Password", text);
     // res.json({ message: "Email sent" });
     res.json(url);
   }catch(err){
@@ -201,7 +202,7 @@ const forgotPassword = async (req, res) => {
   }
 }
 
-const sendEmail = async (req, res) => {
+const sendEmail = async (email, subject, text) => {
   try {
       const transporter = nodemailer.createTransport({
           host: process.env.HOST,

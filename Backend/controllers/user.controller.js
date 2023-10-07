@@ -3,6 +3,13 @@ import { prismaClient } from "../src/prisma-client.js";
 import fs from "fs";
 import path from "path";
 
+const selectedData = {
+  name: true,
+  username: true,
+  email: true,
+  photo_profile: true,
+}
+
 const getUser = async (req, res) => {
   const { id } = req.params;
   const baseUrl = `${req.protocol}://${req.get("host")}`;
@@ -46,12 +53,7 @@ const updateUser = async (req, res) => {
     const updatedUser = await prismaClient.user.update({
       where: { id: parseInt(id) },
       data: updateData,
-      select: {
-        name: true,
-        username: true,
-        email: true,
-        photo_profile: true,
-      },
+      select: selectedData
     });
     res.json(updatedUser);
   } catch (error) {
@@ -65,7 +67,8 @@ const updatePhotoProfile = async (req, res) => {
   const { id } = req.params;
   const baseUrl = `${req.protocol}`; //${req.get("host")};
   const file = req.file?.path.split("\\").slice(1).join("\\");
-  if (!file) res.status(400).json("photo profile is not uploaded");
+  const data = { photo_profile: file };
+  if (!file) data.photo_profile = null;
   try {
     const user = await prismaClient.user.findUnique({
       where: { id: parseInt(id) },
@@ -74,20 +77,13 @@ const updatePhotoProfile = async (req, res) => {
     if (!user) res.status(400).json("user is not found");
     const updatedPhotoProfile = await prismaClient.user.update({
       where: { id: parseInt(id) },
-      data: {
-        photo_profile: file,
-      },
-      select: {
-        name: true,
-        username: true,
-        email: true,
-        photo_profile: true,
-      },
+      data: data,
+      select: selectedData
     });
-    updatedPhotoProfile.photo_profile = `${baseUrl}/${updatedPhotoProfile.photo_profile}`;
+    updatedPhotoProfile.photo_profile = updatedPhotoProfile.photo_profile && `${baseUrl}/${updatedPhotoProfile.photo_profile}`;
     if (user.photo_profile) {
       const photoProfilePath = path.join("public", user.photo_profile);
-      if (file && updatedPhotoProfile) {
+      if (updatedPhotoProfile) {
         fs.unlink(photoProfilePath, (err) => {
           if (err) {
             return res
