@@ -20,7 +20,6 @@ const register = async (req, res) => {
       "Content-Type": "application/json",
     });
     res.status(201).json({
-      data: user,
       message: "Create user is successfully created",
     });
   } catch (err) {
@@ -165,7 +164,8 @@ const refreshToken = async (req, res) => {
           maxAge: 24 * 60 * 60 * 1000,
           // secure: true //untuk htpps
         });
-        if(token.user.photo_profile !== null) token.user.photo_profile = `${baseUrl}/${token.user.photo_profile}`;
+        console.log(token.user.photo_profile);
+        if(token.user.photo_profile.length > 0) token.user.photo_profile = `${baseUrl}/${token.user.photo_profile}`;
         res.json({
           photoProfile: token.user.photo_profile,
           accessToken: accessToken,

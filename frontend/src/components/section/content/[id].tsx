@@ -24,7 +24,7 @@ const ProfilePosts = () => {
   const myItemRef = useRef<HTMLButtonElement | null>(null);
 
   // const [profilePosts, setProfilePosts] = useState([])
-  const [isLoading, setLoading] = useState<Boolean>(true);
+  const [isLoading, setLoading] = useState(true);
   const { posts, userData, accessToken } = useSelector((state: RootState) => state.utils);
 
   const { toast } = useToast();

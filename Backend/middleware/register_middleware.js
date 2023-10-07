@@ -15,7 +15,7 @@ export const registerMiddleware = async (req, res, next) => {
       "string.email": "Invalid email format",
       "any.required": "Email is required",
     }),
-    photo_profile: Joi.string().messages({
+    photo_profile: Joi.string().allow("").messages({
       "string.empty": "Photo profile cannot be empty",
     }),
     password: Joi.string().min(6).required().messages({

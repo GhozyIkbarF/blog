@@ -107,7 +107,7 @@ const Profile = () => {
                   </div>
                   {id === userData?.userId &&
                     <div>
-                      <Button variant="secondary" size="sm" onClick={() => router.push("/settings/profile")}>Edit profile</Button>
+                      <Button variant="secondary" size="sm" onClick={() => router.push("/settings/avatar")}>Edit profile</Button>
                     </div>
                   }
                 </div>

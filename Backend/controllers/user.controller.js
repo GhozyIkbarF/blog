@@ -3,6 +3,13 @@ import { prismaClient } from "../src/prisma-client.js";
 import fs from "fs";
 import path from "path";
 
+const selectedData = {
+  name: true,
+  username: true,
+  email: true,
+  photo_profile: true,
+}
+
 const getUser = async (req, res) => {
   const { id } = req.params;
   const baseUrl = `${req.protocol}://${req.get("host")}`;
@@ -21,7 +28,8 @@ const getUser = async (req, res) => {
     if (!record) {
       return res.status(404).json({ error: "Record not found" });
     }
-    if(record.photo_profile !== null) record.photo_profile = `${baseUrl}/${record.photo_profile}`;
+    if (record.photo_profile !== null)
+      record.photo_profile = `${baseUrl}/${record.photo_profile}`;
     res.json(record);
   } catch (error) {
     console.error(error);
@@ -41,16 +49,11 @@ const updateUser = async (req, res) => {
       select: { password: true },
     });
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(404).json({password: "password is wrong"});
+    if (!match) return res.status(404).json({ password: "password is wrong" });
     const updatedUser = await prismaClient.user.update({
       where: { id: parseInt(id) },
       data: updateData,
-      select: {
-        name: true,
-        username: true,
-        email: true,
-        photo_profile: true,
-      },
+      select: selectedData
     });
     res.json(updatedUser);
   } catch (error) {
@@ -62,31 +65,25 @@ const updateUser = async (req, res) => {
 
 const updatePhotoProfile = async (req, res) => {
   const { id } = req.params;
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const baseUrl = `${req.protocol}`; //${req.get("host")};
   const file = req.file?.path.split("\\").slice(1).join("\\");
-  if (!file) res.status(400).json('photo profile is not uploaded')
+  const data = { photo_profile: file };
+  if (!file) data.photo_profile = null;
   try {
     const user = await prismaClient.user.findUnique({
       where: { id: parseInt(id) },
       select: { photo_profile: true },
     });
-    if(!user) res.status(400).json('user is not found')
+    if (!user) res.status(400).json("user is not found");
     const updatedPhotoProfile = await prismaClient.user.update({
       where: { id: parseInt(id) },
-      data: {
-        photo_profile: file
-      },
-      select: {
-        name: true,
-        username: true,
-        email: true,
-        photo_profile: true,
-      },
+      data: data,
+      select: selectedData
     });
-    updatedPhotoProfile.photo_profile = `${baseUrl}/${updatedPhotoProfile.photo_profile}`;
+    updatedPhotoProfile.photo_profile = updatedPhotoProfile.photo_profile && `${baseUrl}/${updatedPhotoProfile.photo_profile}`;
     if (user.photo_profile) {
       const photoProfilePath = path.join("public", user.photo_profile);
-      if (file && updatedPhotoProfile) {
+      if (updatedPhotoProfile) {
         fs.unlink(photoProfilePath, (err) => {
           if (err) {
             return res
@@ -115,7 +112,8 @@ const updatePassword = async (req, res) => {
       select: { password: true },
     });
     const match = await bcrypt.compare(oldPassword, user.password);
-    if (!match) return res.status(404).json({oldPassword: "old password is wrong"});
+    if (!match)
+      return res.status(404).json({ oldPassword: "old password is wrong" });
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await prismaClient.user.update({
       where: { id: parseInt(id) },
@@ -140,4 +138,4 @@ const deleteUser = (req, res) => {
   }
 };
 
-export { getUser, updateUser, updatePhotoProfile, updatePassword, deleteUser }
+export { getUser, updateUser, updatePhotoProfile, updatePassword, deleteUser };

@@ -62,9 +62,9 @@ const Login = () => {
       clearErrors(["email", "password"]);
       router.push('/')
     } catch (err: any) {
-      if(err.response){
-        for(const error in err.response.data){
-         setError(error as 'email' | 'password', {
+      if (err.response) {
+        for (const error in err.response.data) {
+          setError(error as 'email' | 'password', {
             type: "manual",
             message: err.response.data[error],
           });
@@ -81,7 +81,7 @@ const Login = () => {
     if (isLogin) {
       router.push('/')
     }
-  },[isLogin])
+  }, [isLogin])
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -120,7 +120,7 @@ const Login = () => {
                   <div className="flex flex-col space-y-3">
                     <div className='flex justify-between items-end p-0'>
                       <Label htmlFor="password" className="after:content-['*'] after:text-red-500">Password </Label>
-                      <Link href="/forgot-password" className='text-xs'>Forgot Password?</Link>
+                      <Link href="/forgot-password" className='text-xs text-foreground'>Forgot Password?</Link>
                     </div>
                     <div className="relative">
                       <Input

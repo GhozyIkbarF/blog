@@ -1,5 +1,5 @@
 import jwt_decode from "jwt-decode";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 import { prismaClient } from "../src/prisma-client.js";
 import fs from "fs";
 import path from "path";
@@ -123,13 +123,13 @@ const searchPosts = async (req, res) => {
 
 const getProfilePosts = async (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const authHeader = req.get('Authorization');
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.get("Authorization");
+  const token = authHeader && authHeader.split(" ")[1];
   let authorId = parseInt(req.params.id);
   const whereCondition = { authorId: parseInt(req.params.id) }
   try {
-    if (token == null) getPost();
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (token == null) whereCondition.published = true;
+    else jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
       if (err) {
         whereCondition.published = true;
       } else {
@@ -205,12 +205,7 @@ const updatePost = async (req, res) => {
           data: updateData,
           include: {
             author: {
-              select: {
-                name: true,
-                username: true,
-                email: true,
-                photo_profile: true,
-              },
+              select: selectAuthor
             },
           },
         });
@@ -259,4 +254,12 @@ const deletePost = async (req, res) => {
   }
 };
 
-export { createPost, getPosts, searchPosts, getProfilePosts, getPost, updatePost, deletePost }
+export {
+  createPost,
+  getPosts,
+  getProfilePosts,
+  getPost,
+  searchPosts,
+  updatePost,
+  deletePost,
+};

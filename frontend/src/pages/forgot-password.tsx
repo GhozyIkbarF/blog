@@ -46,29 +46,29 @@ const Login = () => {
   const { toast } = useToast();
   const onSubmit = async (value: Inputs) => {
     try {
-      const { data } = await axios.post(`${baseURL}/forgot-password`, value, {headers});
+      const { data } = await axios.post(`${baseURL}/forgot-password`, value, { headers });
       console.log(data);
-      
+
       toast({
         title: "Login Success!",
         duration: 2500,
       })
       reset();
       clearErrors(["email"]);
-    //   router.push('/')
+      //   router.push('/')
     } catch (err: any) {
-      if(err.response){
-        for(const error in err.response.data){
-         setError(error as 'email', {
+      if (err.response) {
+        for (const error in err.response.data) {
+          setError(error as 'email', {
             type: "manual",
             message: err.response.data[error],
           });
         }
-    }
-    toast({
-      title: "Sign Up Failed!",
-      duration: 5000,
-    })
+      }
+      toast({
+        title: "Sign Up Failed!",
+        duration: 5000,
+      })
     }
   };
 
@@ -108,12 +108,12 @@ const Login = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full">Reset Passsword</Button>
+                <Button type="submit" className="w-full">Reset Password</Button>
               </CardFooter>
             </form>
           </Card>
           <Button asChild className="w-96" variant="ghost">
-            <Link href="/login">Cencel</Link>
+            <Link href="/login">Cancel</Link>
           </Button>
         </div>
       </main>
