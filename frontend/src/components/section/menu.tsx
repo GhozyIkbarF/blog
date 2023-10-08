@@ -15,10 +15,8 @@ const Menu = () => {
   const id: number | undefined = parseInt(router.query.id as string);
   const [debounceValue] = useDebounce(search, 1500);
   const [categoryValue] = useDebounce(category, 1000);
-  
   const dispatch = useDispatch();
-  
-  
+
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
   const handleSearch = async () => {
     const { data } = await axios.get(`${baseURL}/search-post`, {
@@ -28,25 +26,25 @@ const Menu = () => {
       }
     });
     // console.log(data);
-    
+
     dispatch(setPosts(data))
   };
 
-  useEffect(() => { 
-    handleSearch() 
+  useEffect(() => {
+    handleSearch()
   }, [debounceValue, categoryValue])
-  
+
   return (
     <Card className="p-3">
       <div className="flex flex-col-reverse gap-2 justify-between sm:flex-row">
         <Categories onClick={setCategory} />
-        <Input 
-          className="w-full sm:w-60" 
-          type="text" 
-          name="search" 
-          id="search" 
-          placeholder="Search..." 
-          onChange={(e) => setSearch(e.target.value)} 
+        <Input
+          className="w-full sm:w-60"
+          type="text"
+          name="search"
+          id="search"
+          placeholder="Search..."
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
     </Card>

@@ -22,7 +22,7 @@ const Post = () => {
   // socket.on("post", (data) => {
   //   dispatch(setPosts(data));
   // });
-  
+
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
 
   const [isLoading, setLoading] = useState<Boolean>(true);
@@ -39,6 +39,8 @@ const Post = () => {
         setLoading(false);
       });
   }, []);
+
+  console.log(posts);
 
   if (isLoading) return <PostLoad />;
   if (!posts) return <p className="text-center" >No post data</p>;
