@@ -1,6 +1,5 @@
 import React from 'react'
-import { Toggle } from "@/components/ui/toggle"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import * as ToggleGroup from '@radix-ui/react-toggle-group';
 
 const categories = [
   {
@@ -35,18 +34,25 @@ type CategoriesProps = {
 }
 
 const Categories = ({ className, onClick }: CategoriesProps) => {
+  const toggleGroupItemClasses = "h-10 px-3 rounded-md text-sm font-medium ring-offset-background transition-colors border border-dashed border-input bg-transparent hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground";
+
   const handleChangeCategory = (param: string) => {
     onClick(param)
   }
 
   return (
-    <div className={`flex gap-2 overflow-x-auto ${className}`}>
+    <ToggleGroup.Root
+      className={`flex gap-2 overflow-x-auto ${className}`}
+      type="single"
+      defaultValue=""
+      aria-label="Text alignment"
+    >
       {categories.map((category, index) => (
-        <Toggle key={index} variant="outline" aria-label="Toggle category" className="border-dashed" onClick={() => handleChangeCategory(category.value)}>
+        <ToggleGroup.Item key={index} className={toggleGroupItemClasses} value={category.value} aria-label={category.label} onClick={() => handleChangeCategory(category.value)}>
           {category.label}
-        </Toggle>
+        </ToggleGroup.Item>
       ))}
-    </div>
+    </ToggleGroup.Root>
   )
 }
 

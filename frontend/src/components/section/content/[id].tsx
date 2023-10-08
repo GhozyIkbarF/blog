@@ -17,7 +17,7 @@ import axios from 'axios'
 import { useToast } from "@/components/ui/use-toast"
 import ProfilePostLoad from '@/components/skeleton/profilepostload'
 
-const ProfilePosts = () => {
+const ProfilePosts = ({ categoryLabel }: { categoryLabel: string }) => {
   const router = useRouter()
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
   const id: number | undefined = parseInt(router.query.id as string);
@@ -37,7 +37,7 @@ const ProfilePosts = () => {
   const getProfilePosts = async () => {
     setLoading(true)
     try {
-      const res = await axios.get(`${baseURL}/profileposts/${id}`, {headers});
+      const res = await axios.get(`${baseURL}/profileposts/${id}`, { headers });
       dispatch(setPosts(res.data))
     } catch (err) {
       console.log(err)
@@ -76,7 +76,7 @@ const ProfilePosts = () => {
   return (
     <article className="flex flex-col">
       <h4 className="pb-3 text-center">
-        {`${posts.length} ${posts.length > 1 ? `Posts` : `Post`} in all categories`}
+        {`${posts.length} ${posts.length > 1 ? `Posts` : `Post`} in ${categoryLabel === "" ? "all categories" : categoryLabel.replace(/\b\w/g, l => l.toUpperCase())}`}
       </h4>
       {posts.length > 0 && <Separator />}
       {posts?.map((post: any, index: number) => (
