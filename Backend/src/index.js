@@ -29,4 +29,4 @@ app.use('/api', post_router)
 const port = process.env.PORT;
 app.listen(port, () => console.log(`aplication run in port ${port}`));
 
-module.exports = app;
+// module.exports = app;
