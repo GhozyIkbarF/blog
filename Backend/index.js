@@ -19,10 +19,14 @@ app.use(express.json());
 app.use(express.static('public'));
 // app.use(expressFileUpload())
 
-
+app.get('/', (req, res) => {
+    res.json({ message: 'Hello World' })
+})
 app.use('/api', auth_router)
 app.use('/api', user_router)
 app.use('/api', post_router)
 
 const port = process.env.PORT;
 app.listen(port, () => console.log(`aplication run in port ${port}`));
+
+module.exports = app;
