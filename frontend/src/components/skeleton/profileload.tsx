@@ -42,7 +42,9 @@ const ProfileLoad = () => {
                 </div>
               </CardHeader>
             </div>
-            <Categories className="p-6 sm:justify-center" />
+            <Categories className="p-6 sm:justify-center" onClick={function (param: string): void {
+              throw new Error('Function not implemented.')
+            } } />
           </section>
         </Card>
       </section>
