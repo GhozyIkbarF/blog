@@ -22,7 +22,11 @@ interface Inputs {
   name: string;
   username: string;
   email: string;
+<<<<<<< HEAD
   photo_profile?: any;
+=======
+  photo_profile?: File | string;
+>>>>>>> 19c94d1cac21f6a37e7f311b4ab0fb9bd90eceb4
   password: string;
   confirmPassword: string;
 }
@@ -50,7 +54,7 @@ const SignUp = () => {
       name: "",
       username: "",
       email: "",
-      photo_profile: "",
+      // photo_profile: "",
       password: "",
       confirmPassword: "",
     },
@@ -65,11 +69,19 @@ const SignUp = () => {
   const onSubmit = async (data: Inputs) => {
     console.log(data);
     try {
+<<<<<<< HEAD
       const res = await axios.post(`${baseURL}/register`, data, { headers });
       reset();
       console.log(res);
       clearErrors(["name", "username", "email", "photo_profile", "password", "confirmPassword"]);
       router.push('/login')
+=======
+      // const res = await axios.post(`${baseURL}/register`, data, { headers });
+      // reset();
+      // console.log(res);
+      // clearErrors(["name", "username", "email", "photo_profile", "password", "confirmPassword"]);
+      // router.push('/login')
+>>>>>>> 19c94d1cac21f6a37e7f311b4ab0fb9bd90eceb4
       toast({
         title: "Sign Up Success!",
         duration: 2500,
@@ -116,7 +128,11 @@ const SignUp = () => {
 
   const deleteAvatar = () => {
     setPreview("") 
+<<<<<<< HEAD
     setValue("photo_profile", "")
+=======
+    // setValue("file", )
+>>>>>>> 19c94d1cac21f6a37e7f311b4ab0fb9bd90eceb4
   }
 
   const inputData = [

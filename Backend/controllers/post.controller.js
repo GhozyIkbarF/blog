@@ -60,7 +60,8 @@ const getPosts = async (req, res) => {
     if (posts) {
       posts.forEach((post) => {
         post.image = `${baseUrl}/${post.image}`;
-        if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+        if (post.author.photo_profile !== null)
+          post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
       });
     }
 
@@ -70,36 +71,37 @@ const getPosts = async (req, res) => {
   }
 };
 
-
 const searchPosts = async (req, res) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const authHeader = req.get('Authorization');
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.get("Authorization");
+  const token = authHeader && authHeader.split(" ")[1];
   const whereCondition = {};
 
   if (token == null) {
     whereCondition.published = true;
     whereCondition.title = { contains: req.query.search };
-  } else jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) {
-      res.status(401).json({ message: "Unauthorized" });
-    } else {
-      const decoded = jwt_decode(token);
-      if (parseInt(decoded.userId) != parseInt(req.query.id)) {
-        whereCondition.published = true;
-        whereCondition.authorId = parseInt(req.query.id);
-      } else whereCondition.authorId = parseInt(req.query.id);
-    }
-  })
+  } else
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+        res.status(401).json({ message: "Unauthorized" });
+      } else {
+        const decoded = jwt_decode(token);
+        if (parseInt(decoded.userId) != parseInt(req.query.id)) {
+          whereCondition.published = true;
+          whereCondition.authorId = parseInt(req.query.id);
+        } else whereCondition.authorId = parseInt(req.query.id);
+      }
+    });
 
   try {
-    if(req.query.category?.length > 0) whereCondition.category = { equals: req.query.category };
-    if(req.query.id) whereCondition.authorId = parseInt(req.query.id);
+    if (req.query.category?.length > 0) {
+      whereCondition.category = { equals: req.query.category };
+    }
     const posts = await prismaClient.post.findMany({
       where: whereCondition,
       include: {
         author: {
-          select: selectAuthor
+          select: selectAuthor,
         },
       },
       orderBy: {
