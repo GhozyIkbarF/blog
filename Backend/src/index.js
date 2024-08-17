@@ -4,9 +4,9 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 // import bodyParser from 'body-parser';
 // import expressFileUpload from 'express-fileupload';
-import auth_router from './routers/auth_router.js';
-import user_router from './routers/user_router.js';
-import post_router from './routers/post_router.js';
+import auth_router from '../routers/auth_router.js';
+import user_router from '../routers/user_router.js';
+import post_router from '../routers/post_router.js';
 
 
 dotenv.config();
