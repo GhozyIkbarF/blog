@@ -31,7 +31,6 @@ const Profile = () => {
   const { userData, accessToken } = useSelector((state: RootState) => state.utils);
   const [isLoading, setLoading] = useState(true);
   const [categoryValue] = useDebounce(category, 1000);
-  
   const dispatch = useDispatch();
 
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
@@ -52,6 +51,11 @@ const Profile = () => {
     getDetailProfile(id);
   }, [id]);
   
+  useEffect(() => { 
+    if (!id || isLoading) return;
+    handleSearch() 
+  }, [categoryValue])
+
   const handleSearch = async () => {
     const { data } = await axios.get(`${baseURL}/search-post`, {
       headers: {
@@ -65,9 +69,9 @@ const Profile = () => {
     dispatch(setPosts(data))
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     if (!id || isLoading) return;
-    handleSearch() 
+    handleSearch()
   }, [categoryValue])
 
   if (isLoading) return <ProfileLoad />;
@@ -113,8 +117,8 @@ const Profile = () => {
                 </div>
               </CardHeader>
             </div>
-            <Categories className="p-6 sm:justify-center" onClick={setCategory}/>
-            <ProfilePosts />
+            <Categories className="p-6 sm:justify-center" onClick={setCategory} />
+            <ProfilePosts categoryLabel={categoryValue} />
           </section>
         </Card>
       </section>

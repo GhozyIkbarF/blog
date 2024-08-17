@@ -4,13 +4,12 @@ import { prismaClient } from "../src/prisma-client.js";
 import fs from "fs";
 import path from "path";
 
-
 const selectAuthor = {
   name: true,
   username: true,
   email: true,
   photo_profile: true,
-}
+};
 
 const createPost = async (req, res) => {
   const { authorId, title, content, published, category } = req.body;
@@ -30,7 +29,7 @@ const createPost = async (req, res) => {
       },
       include: {
         author: {
-          select: selectAuthor
+          select: selectAuthor,
         },
       },
     });
@@ -51,7 +50,7 @@ const getPosts = async (req, res) => {
       },
       include: {
         author: {
-          select: selectAuthor
+          select: selectAuthor,
         },
       },
       orderBy: {
@@ -94,9 +93,8 @@ const searchPosts = async (req, res) => {
   })
 
   try {
-    if (req.query.category?.length > 0) {
-      whereCondition.category = { equals: req.query.category };
-    }
+    if(req.query.category?.length > 0) whereCondition.category = { equals: req.query.category };
+    if(req.query.id) whereCondition.authorId = parseInt(req.query.id);
     const posts = await prismaClient.post.findMany({
       where: whereCondition,
       include: {
@@ -126,25 +124,26 @@ const getProfilePosts = async (req, res) => {
   const authHeader = req.get("Authorization");
   const token = authHeader && authHeader.split(" ")[1];
   let authorId = parseInt(req.params.id);
-  const whereCondition = { authorId: parseInt(req.params.id) }
+  const whereCondition = { authorId: parseInt(req.params.id) };
   try {
     if (token == null) whereCondition.published = true;
-    else jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-      if (err) {
-        whereCondition.published = true;
-      } else {
-        const decoded = jwt_decode(token);
-        if (decoded.userId != authorId) {
+    else
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
           whereCondition.published = true;
         } else {
+          const decoded = jwt_decode(token);
+          if (decoded.userId != authorId) {
+            whereCondition.published = true;
+          } else {
+          }
         }
-      }
-    })
+      });
     const posts = await prismaClient.post.findMany({
       where: whereCondition,
       include: {
         author: {
-          select: selectAuthor
+          select: selectAuthor,
         },
       },
       orderBy: {
@@ -170,7 +169,7 @@ const getPost = async (req, res) => {
       where: { id: parseInt(req.params.id) },
       include: {
         author: {
-          select: selectAuthor
+          select: selectAuthor,
         },
       },
     });
@@ -205,7 +204,7 @@ const updatePost = async (req, res) => {
           data: updateData,
           include: {
             author: {
-              select: selectAuthor
+              select: selectAuthor,
             },
           },
         });

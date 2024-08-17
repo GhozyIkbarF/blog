@@ -15,8 +15,12 @@ export const registerMiddleware = async (req, res, next) => {
       "string.email": "Invalid email format",
       "any.required": "Email is required",
     }),
-    photo_profile: Joi.string().allow("").messages({
-      "string.empty": "Photo profile cannot be empty",
+    photo_profile: Joi.alternatives().try(
+      // Joi.string(), // Allow a string (e.g., URL or file path)
+      // Joi.object().type(Blob), // Allow a Blob (for file uploads)
+      Joi.any().allow(null, '', {}) // Allow null values
+    ).messages({
+      "alternatives.match": "Photo Profile must be a valid image file, URL, or null",
     }),
     password: Joi.string().min(6).required().messages({
       "string.min": "Password must be at least 6 characters long",

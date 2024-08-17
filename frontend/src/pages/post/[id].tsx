@@ -54,7 +54,7 @@ const DetailedPost = () => {
   const { userData, posts } = useSelector((state: RootState) => state.utils);
   const myItemRef = useRef<HTMLButtonElement | null>(null);
   const [isLoading, setLoading] = useState(true);
-  
+
   const router = useRouter();
   const id: number | undefined = parseInt(router.query.id as string);
 
@@ -62,22 +62,33 @@ const DetailedPost = () => {
   const dispatch = useDispatch();
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
 
-  const getDetailPost = async (id: number) => {
-    setLoading(true)
-    try {
-      const res = await axios.get(`${baseURL}/post/${id}`);
-      dispatch(setPosts([res.data]));
-    } catch (err) {
-      return router.push("/404")
-    } finally {
-      setLoading(false)
-    }
-  };
+  // const getDetailPost = async (id: number) => {
+  //   setLoading(true)
+  //   try {
+  //     const res = await axios.get(`${baseURL}/post/${id}`);
+  //     dispatch(setPosts([res.data]));
+  //   } catch (err) {
+  //     return router.push("/404")
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // };
 
   useEffect(() => {
     if (!id) return;
+    const getDetailPost = async (id: number) => {
+      setLoading(true)
+      try {
+        const res = await axios.get(`${baseURL}/post/${id}`);
+        dispatch(setPosts([res.data]));
+      } catch (err) {
+        return router.push("/404")
+      } finally {
+        setLoading(false)
+      }
+    };
     getDetailPost(id);
-  }, [id]);
+  }, [id, baseURL, dispatch, router]);
 
   const deletePost = async (id?: number) => {
     try {
@@ -165,7 +176,7 @@ const DetailedPost = () => {
             </CardHeader>
             <article className="flex flex-col">
               <CardContent>
-                <Badge className="mb-3 cursor-default">{posts[0]?.category?.replace(/\b\w/g, l => l.toUpperCase())}</Badge>
+                <Badge className="mb-3 cursor-default">{(posts[0]?.category as string).replace(/\b\w/g, l => l.toUpperCase())}</Badge>
                 <h2 className="mb-3">{posts[0]?.title}</h2>
                 <div className="relative h-96">
                   <Image src={(posts[0]?.image as string)?.replace(/\\/g, "/")} className="object-contain" fill={true} alt="image" priority={true} />

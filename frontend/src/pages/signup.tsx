@@ -22,7 +22,7 @@ interface Inputs {
   name: string;
   username: string;
   email: string;
-  photo_profile?: File | string;
+  photo_profile?: any;
   password: string;
   confirmPassword: string;
 }
@@ -50,7 +50,7 @@ const SignUp = () => {
       name: "",
       username: "",
       email: "",
-      // photo_profile: "",
+      photo_profile: "",
       password: "",
       confirmPassword: "",
     },
@@ -65,11 +65,11 @@ const SignUp = () => {
   const onSubmit = async (data: Inputs) => {
     console.log(data);
     try {
-      // const res = await axios.post(`${baseURL}/register`, data, { headers });
-      // reset();
-      // console.log(res);
-      // clearErrors(["name", "username", "email", "photo_profile", "password", "confirmPassword"]);
-      // router.push('/login')
+      const res = await axios.post(`${baseURL}/register`, data, { headers });
+      reset();
+      console.log(res);
+      clearErrors(["name", "username", "email", "photo_profile", "password", "confirmPassword"]);
+      router.push('/login')
       toast({
         title: "Sign Up Success!",
         duration: 2500,
@@ -97,7 +97,7 @@ const SignUp = () => {
 
   const handleSave = async () => {
     if (cropRef) {
-      const dataUrl = cropRef.current?.getImage().toDataURL();
+      const dataUrl = (cropRef.current as any)?.getImage().toDataURL();
       console.log(dataUrl);
       const result = await fetch(dataUrl);
       const blob = await result.blob();
@@ -116,7 +116,7 @@ const SignUp = () => {
 
   const deleteAvatar = () => {
     setPreview("") 
-    // setValue("file", )
+    setValue("photo_profile", "")
   }
 
   const inputData = [
@@ -124,6 +124,7 @@ const SignUp = () => {
       label: "Name",
       type: "text",
       id: "name",
+      isRequired: true,
       placeholder: "Enter your name",
       error: errors.name,
       errorMessage: errors.name?.message,
@@ -132,6 +133,7 @@ const SignUp = () => {
       label: "Username",
       type: "text",
       id: "username",
+      isRequired: true,
       placeholder: "Enter your username",
       error: errors.username,
       errorMessage: errors.username?.message,
@@ -140,6 +142,7 @@ const SignUp = () => {
       label: "Email",
       type: "email",
       id: "email",
+      isRequired: true,
       placeholder: "someone@example.com",
       error: errors.email,
       errorMessage: errors.email?.message,
@@ -148,6 +151,7 @@ const SignUp = () => {
       label: "Photo profile",
       type: "file",
       id: "photo_profile",
+      isRequired: false,
       placeholder: "Upload your avatar",
       error: errors.photo_profile,
       errorMessage: errors.photo_profile?.message,
@@ -156,6 +160,7 @@ const SignUp = () => {
       label: "Password",
       type: "password",
       id: "password",
+      isRequired: true,
       placeholder: "Enter your password",
       error: errors.password,
       errorMessage: errors.password?.message,
@@ -164,6 +169,7 @@ const SignUp = () => {
       label: "Confirm password",
       type: "password",
       id: "confirmPassword",
+      isRequired: true,
       placeholder: "Password confirmation",
       error: errors.confirmPassword,
       errorMessage: errors.confirmPassword?.message,
@@ -186,9 +192,9 @@ const SignUp = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <CardContent>
                 <div className="grid w-full items-center gap-4">
-                  {inputData.map((item, index) => (
+                  {inputData.map((item: any, index: number) => (
                     <div key={index} className="flex flex-col space-y-3">
-                      <Label htmlFor="email" className="after:content-['*'] after:text-red-500">{item.label} </Label>
+                      <Label htmlFor="email" className={item.isRequired && "after:content-['*'] after:text-red-500"}>{item.label} </Label>
                       {item.type !== "password" && item.type !== "file"
                         ? <Input
                           type={item.type}
