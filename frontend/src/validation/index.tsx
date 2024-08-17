@@ -25,6 +25,7 @@ const CREATE_USER = Yup.object().shape({
     }),
     photo_profile: Yup.mixed()
     .test('fileType', 'Unsupported File Format', function (value) {
+      if (value === "") return true; // Allow already saved URLs (strings)
       if (typeof value === 'string') return true; // Allow already saved URLs (strings)
       if (value instanceof FileList) value = value[0]; // Get the actual file if using FileList
 

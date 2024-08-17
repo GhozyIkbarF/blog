@@ -50,7 +50,7 @@ const SignUp = () => {
       name: "",
       username: "",
       email: "",
-      // photo_profile: "",
+      photo_profile: "",
       password: "",
       confirmPassword: "",
     },
