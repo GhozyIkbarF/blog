@@ -40,8 +40,6 @@ const Post = () => {
       });
   }, []);
 
-  console.log(posts);
-
   if (isLoading) return <PostLoad />;
   if (!posts) return <p className="text-center" >No post data</p>;
 

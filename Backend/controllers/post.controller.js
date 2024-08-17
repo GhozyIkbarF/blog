@@ -34,8 +34,7 @@ const createPost = async (req, res) => {
       },
     });
     if (post) post.image = `${baseUrl}/${post.image}`;
-    if (post.author.photo_profile !== null)
-      post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+    if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(201).json(post);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -112,8 +111,7 @@ const searchPosts = async (req, res) => {
     if (posts) {
       posts.forEach((post) => {
         post.image = `${baseUrl}/${post.image}`;
-        if (post.author.photo_profile !== null)
-          post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+        if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
       });
     }
 
@@ -178,8 +176,7 @@ const getPost = async (req, res) => {
       },
     });
     post.image = `${baseUrl}/${post.image}`;
-    if (post.author.photo_profile !== null)
-      post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+    if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(200).json(post);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -218,8 +215,7 @@ const updatePost = async (req, res) => {
     );
     const imagePath = path.join("public", searchPost.image);
     post.image = `${baseUrl}/${post.image}`;
-    if (post.author.photo_profile !== null)
-      post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+    if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     if (searchPost.image) {
       if (file && post) {
         fs.unlink(imagePath, (err) => {

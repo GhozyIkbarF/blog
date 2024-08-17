@@ -13,7 +13,6 @@ dotenv.config();
 const app = express();
 app.disable('X-Powered-By');
 app.use(cors({ origin: true, credentials: true }));
-// app.use(cors());
 app.use(cookieParser());;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

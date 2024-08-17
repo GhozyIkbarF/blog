@@ -74,7 +74,7 @@ const AvatarSettings = () => {
 
   const handleSave = async () => {
     if (cropRef.current) {
-      const dataUrl = cropRef.current.getImage().toDataURL();
+      const dataUrl = (cropRef.current as any)?.getImage().toDataURL();
       const result = await fetch(dataUrl);
       const blob = await result.blob();
       const newfile = new File([blob], "file5645456.webp", { type: 'image/webp' });

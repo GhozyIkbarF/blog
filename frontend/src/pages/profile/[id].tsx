@@ -31,7 +31,6 @@ const Profile = () => {
   const { userData, accessToken } = useSelector((state: RootState) => state.utils);
   const [isLoading, setLoading] = useState(true);
   const [categoryValue] = useDebounce(category, 1000);
-
   const dispatch = useDispatch();
 
   const baseURL = process.env.NEXT_PUBLIC_API_CALL;
@@ -51,6 +50,11 @@ const Profile = () => {
     if (!id) return;
     getDetailProfile(id);
   }, [id]);
+  
+  useEffect(() => { 
+    if (!id || isLoading) return;
+    handleSearch() 
+  }, [categoryValue])
 
   const handleSearch = async () => {
     const { data } = await axios.get(`${baseURL}/search-post`, {
