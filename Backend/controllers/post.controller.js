@@ -182,7 +182,7 @@ const updatePost = async (req, res) => {
     updateData.published = JSON.parse(published);
     // const [searchPost, post] = await prismaClient.$transaction(
     //   async (prisma) => {
-        const searchPost = await prisma.post.findUnique({
+        const searchPost = await prismaClient.post.findUnique({
           where: { id: parseInt(req.params.id) },
           select: {
             image: true,
@@ -210,7 +210,7 @@ const updatePost = async (req, res) => {
           .remove([urlOldImage]);
         }
 
-        const post = await prisma.post.update({
+        const post = await prismaClient.post.update({
           where: { id: parseInt(req.params.id) },
           data: updateData,
           include: {
