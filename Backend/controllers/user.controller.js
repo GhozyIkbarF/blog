@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import { prismaClient } from "../src/prisma-client.js";
-import fs from "fs";
-import path from "path";
+import { supabase } from "../src/supabase-client.js";
 
 const selectedData = {
   name: true,
@@ -9,10 +8,10 @@ const selectedData = {
   email: true,
   photo_profile: true,
 }
+let urlStorage = `${process.env.SUPABASE_URL}/storage/v1/object/public/images/`;
 
 const getUser = async (req, res) => {
   const { id } = req.params;
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
   try {
     const record = await prismaClient.user.findUnique({
       where: { id: parseInt(id) },
@@ -28,9 +27,7 @@ const getUser = async (req, res) => {
     if (!record) {
       return res.status(404).json({ error: "Record not found" });
     }
-    if (record.photo_profile !== null)
-      record.photo_profile = `${baseUrl}/${record.photo_profile}`;
-    res.json(record);
+    res.status(200).json(record);
   } catch (error) {
     console.error(error);
     res
@@ -65,35 +62,59 @@ const updateUser = async (req, res) => {
 
 const updatePhotoProfile = async (req, res) => {
   const { id } = req.params;
-  const baseUrl = `${req.protocol}`; //${req.get("host")};
-  const file = req.file?.path.split("\\").slice(1).join("\\");
-  const data = { photo_profile: file };
-  if (!file) data.photo_profile = null;
+  // const file = req.file?.path.split("\\").slice(1).join("\\");
+  const file = req.file;
+  const dataUpdate = { photo_profile: file };
+  if (!file) dataUpdate.photo_profile = null;
   try {
     const user = await prismaClient.user.findUnique({
       where: { id: parseInt(id) },
       select: { photo_profile: true },
     });
     if (!user) res.status(400).json("user is not found");
-    const updatedPhotoProfile = await prismaClient.user.update({
-      where: { id: parseInt(id) },
-      data: data,
-      select: selectedData
-    });
-    updatedPhotoProfile.photo_profile = updatedPhotoProfile.photo_profile && `${baseUrl}/${updatedPhotoProfile.photo_profile}`;
-    if (user.photo_profile) {
-      const photoProfilePath = path.join("public", user.photo_profile);
-      if (updatedPhotoProfile) {
-        fs.unlink(photoProfilePath, (err) => {
-          if (err) {
-            return res
-              .status(500)
-              .json({ error: "An error occurred while deleting the file." });
-          }
+
+    if(file){
+      const { data, error } = await supabase.storage
+        .from("images")
+        .upload(`profile_image/${Date.now()}-${file.originalname}`, file.buffer, {
+          contentType: file.mimetype,
         });
+        dataUpdate.photo_profile = urlStorage + data.path;
+      if (error) {
+        throw error;
       }
     }
-    res.status(201).json(updatedPhotoProfile);
+    const updatedPhotoProfile = await prismaClient.user.update({
+      where: { id: parseInt(id) },
+      data: dataUpdate,
+      select: selectedData
+    });
+    
+    const urlOldPhotoProfile = user.photo_profile?.replace(urlStorage, "");
+    if (file && user.photo_profile) {
+      const { error } = await supabase.storage
+        .from("images")
+        .remove([urlOldPhotoProfile]);
+      if (error) {
+        throw error;
+      }
+    }
+
+    // updatedPhotoProfile.photo_profile = updatedPhotoProfile.photo_profile && `${baseUrl}/${updatedPhotoProfile.photo_profile}`;
+    // if (user.photo_profile) {
+    //   const photoProfilePath = path.join("public", user.photo_profile);
+    //   if (updatedPhotoProfile) {
+    //     fs.unlink(photoProfilePath, (err) => {
+    //       if (err) {
+    //         return res
+    //           .status(500)
+    //           .json({ error: "An error occurred while deleting the file." });
+    //       }
+    //     });
+    //   }
+    // }
+    // res.status(201).json(updatedPhotoProfile);
+    res.status(201).json({ message: "photo profile is updated" });
   } catch (error) {
     console.error(error);
     res

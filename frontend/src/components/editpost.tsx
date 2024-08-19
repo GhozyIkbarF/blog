@@ -126,8 +126,8 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
   const category = watch("category");
   const published = watch("published");
   const file = watch("file");
-
-
+  console.log("file",file);
+  
   const { toast } = useToast();
 
   const convertToFormData = (data: Inputs) => {
@@ -137,7 +137,6 @@ const EditPost = ({ id, index, className }: { id?: number, index?: number, class
     formData.append("content", data.content);
     formData.append("category", data.category);
     formData.append("published", data.published.toString());
-    console.log(data.file[0]);
     formData.append("file", data.file[0]);
     return formData;
   };

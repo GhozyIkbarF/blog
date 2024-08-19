@@ -176,7 +176,7 @@ const DetailedPost = () => {
             </CardHeader>
             <article className="flex flex-col">
               <CardContent>
-                <Badge className="mb-3 cursor-default">{(posts[0]?.category as string).replace(/\b\w/g, l => l.toUpperCase())}</Badge>
+                <Badge className="mb-3 cursor-default">{(posts[0]?.category as string)?.replace(/\b\w/g, l => l.toUpperCase())}</Badge>
                 <h2 className="mb-3">{posts[0]?.title}</h2>
                 <div className="relative h-96">
                   <Image src={(posts[0]?.image as string)?.replace(/\\/g, "/")} className="object-contain" fill={true} alt="image" priority={true} />

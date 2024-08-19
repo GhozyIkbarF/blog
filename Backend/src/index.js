@@ -12,7 +12,26 @@ import post_router from '../routers/post_router.js';
 dotenv.config();
 const app = express();
 app.disable('X-Powered-By');
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+// app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+const allowedOrigins = [
+    'http://localhost:3000', // Development origin
+    `${process.env.FRONTEND_URL}` // Production origin
+  ];
+  
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        } else {
+          return callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true
+    })
+  );
 app.use(cookieParser());;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

@@ -127,10 +127,9 @@ const logout = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  // const baseUrl = `${req.protocol}://${req.get("host")}`;
   try {
     const refreshToken = req.cookies.refreshToken;
-    console.log(refreshToken, "pppppppppppppppp");
     if (!refreshToken)
       return res.status(401).json({ message: "Invalid refresh token" });
     const token = await prismaClient.refreshToken.findUnique({
@@ -173,8 +172,8 @@ const refreshToken = async (req, res) => {
           sameSite: 'None',
           secure: true
         });
-        console.log(token.user.photo_profile);
-        if(token.user.photo_profile.length > 0) token.user.photo_profile = `${baseUrl}/${token.user.photo_profile}`;
+        // console.log(token.user.photo_profile);
+        // if(token.user.photo_profile.length > 0) token.user.photo_profile = `${baseUrl}/${token.user.photo_profile}`;
         res.json({
           photoProfile: token.user.photo_profile,
           accessToken: accessToken,

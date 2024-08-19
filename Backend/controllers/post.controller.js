@@ -1,8 +1,7 @@
 import jwt_decode from "jwt-decode";
 import jwt from "jsonwebtoken";
 import { prismaClient } from "../src/prisma-client.js";
-import fs from "fs";
-import path from "path";
+import { supabase } from "../src/supabase-client.js";
 
 const selectAuthor = {
   name: true,
@@ -10,16 +9,28 @@ const selectAuthor = {
   email: true,
   photo_profile: true,
 };
+let urlStorage = `${process.env.SUPABASE_URL}/storage/v1/object/public/images/`;
 
 const createPost = async (req, res) => {
   const { authorId, title, content, published, category } = req.body;
   const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const file = req.file.path.split("\\").slice(1).join("\\");
+  const file = req.file
   try {
+    const { data, error } = await supabase.storage
+      .from("images") // Replace with your actual bucket name
+      .upload(`post/${Date.now()}-${file.originalname}`, file.buffer, {
+        contentType: file.mimetype,
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    const fileUrl = urlStorage + data.path;
     const post = await prismaClient.post.create({
       data: {
         title: title,
-        image: file,
+        image: fileUrl,
         content: content,
         published: JSON.parse(published),
         category: category,
@@ -33,7 +44,6 @@ const createPost = async (req, res) => {
         },
       },
     });
-    if (post) post.image = `${baseUrl}/${post.image}`;
     if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(201).json(post);
   } catch (err) {
@@ -42,7 +52,6 @@ const createPost = async (req, res) => {
 };
 
 const getPosts = async (req, res) => {
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
   try {
     const posts = await prismaClient.post.findMany({
       where: {
@@ -57,13 +66,6 @@ const getPosts = async (req, res) => {
         createdAt: "desc",
       },
     });
-    if (posts) {
-      posts.forEach((post) => {
-        post.image = `${baseUrl}/${post.image}`;
-        if (post.author.photo_profile !== null)
-          post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
-      });
-    }
 
     res.status(200).json(posts);
   } catch (err) {
@@ -108,12 +110,6 @@ const searchPosts = async (req, res) => {
         createdAt: "desc",
       },
     });
-    if (posts) {
-      posts.forEach((post) => {
-        post.image = `${baseUrl}/${post.image}`;
-        if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
-      });
-    }
 
     res.status(200).json(posts);
   } catch (err) {
@@ -152,11 +148,6 @@ const getProfilePosts = async (req, res) => {
         createdAt: "desc",
       },
     });
-    if (posts) {
-      posts.forEach((post) => {
-        post.image = `${baseUrl}/${post.image}`;
-      });
-    }
 
     res.status(200).json(posts);
   } catch (err) {
@@ -175,7 +166,6 @@ const getPost = async (req, res) => {
         },
       },
     });
-    post.image = `${baseUrl}/${post.image}`;
     if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
     res.status(200).json(post);
   } catch (err) {
@@ -184,22 +174,41 @@ const getPost = async (req, res) => {
 };
 
 const updatePost = async (req, res) => {
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
-  const { authorId, title, content, published, category } = req.body;
-  const file = req.file?.path.split("\\").slice(1).join("\\");
+  const { authorId, title, content, published, category, file } = req.body;
+  const image = req.file
   try {
-    let updateData = { authorId, title, content, published, category };
+    let updateData = { authorId, title, content, published, category, image };
     updateData.authorId = parseInt(authorId);
     updateData.published = JSON.parse(published);
-    if (file) updateData.image = file;
-    const [searchPost, post] = await prismaClient.$transaction(
-      async (prisma) => {
+    // const [searchPost, post] = await prismaClient.$transaction(
+    //   async (prisma) => {
         const searchPost = await prisma.post.findUnique({
           where: { id: parseInt(req.params.id) },
           select: {
             image: true,
           },
         });
+        
+        updateData.image = searchPost.image;
+        if(image){
+          const { data, error } = await supabase.storage
+          .from("images") 
+          .upload(`post/${Date.now()}-${image.originalname}`, image.buffer, {
+            contentType: image.mimetype,
+          });
+          updateData.image = urlStorage + data.path;
+          if (error) {
+            throw error;
+          }
+        }
+
+        if(!file && !image) {updateData.image = ''}
+        if(file == undefined || image){
+          const urlOldImage = searchPost.image?.replace(urlStorage, '');
+          const {error} = await supabase.storage
+          .from("images")
+          .remove([urlOldImage]);
+        }
 
         const post = await prisma.post.update({
           where: { id: parseInt(req.params.id) },
@@ -210,23 +219,24 @@ const updatePost = async (req, res) => {
             },
           },
         });
-        return [searchPost, post];
-      }
-    );
-    const imagePath = path.join("public", searchPost.image);
-    post.image = `${baseUrl}/${post.image}`;
-    if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
-    if (searchPost.image) {
-      if (file && post) {
-        fs.unlink(imagePath, (err) => {
-          if (err) {
-            return res
-              .status(500)
-              .json({ error: "An error occurred while deleting the file." });
-          }
-        });
-      }
-    }
+    //     return [searchPost, post];
+    //   }
+    // );
+
+    // const imagePath = path.join("public", searchPost.image);
+    // post.image = `${baseUrl}/${post.image}`;
+    // if (post.author.photo_profile !== null) post.author.photo_profile = `${baseUrl}/${post.author.photo_profile}`;
+    // if (searchPost.image) {
+    //   if (file && post) {
+    //     fs.unlink(imagePath, (err) => {
+    //       if (err) {
+    //         return res
+    //           .status(500)
+    //           .json({ error: "An error occurred while deleting the file." });
+    //       }
+    //     });
+    //   }
+    // }
     res.status(201).json(post);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -235,21 +245,26 @@ const updatePost = async (req, res) => {
 
 const deletePost = async (req, res) => {
   try {
-    const post = await prismaClient.post.delete({
-      where: { id: parseInt(req.params.id) },
-    });
-    if (post) {
-      const imagePath = path.join("public", post.image);
-      fs.unlink(imagePath, (err) => {
-        if (err) {
-          return res
-            .status(500)
-            .json({ error: "An error occurred while deleting the file." });
-        }
-
-        res.json({ message: "Post deleted successfully." });
+      const findPost = await prismaClient.post.findUnique({
+        where: { id: parseInt(req.params.id) },
+        select: {
+          image: true,
+        },
       });
-    }
+
+      const urlOldImage = findPost.image?.replace(urlStorage, '');
+      const {error} = await supabase.storage
+      .from("images")
+      .remove([urlOldImage]);
+
+      if(error){
+        throw error
+      }
+
+      const deletePost = await prismaClient.post.delete({
+        where: { id: parseInt(req.params.id) },
+      });
+      res.json({ message: "Post deleted successfully." });
   } catch (err) {
     res.status().json({ message: err.message });
   }

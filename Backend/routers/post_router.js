@@ -18,6 +18,7 @@ const post_router = express.Router();
 // post_router.get('/post', verifyToken, getPosts);
 // post_router.patch('/post/:id', verifyToken, updatePost);
 post_router.post("/post", upload.single("file"), createPost);
+// post_router.post("/post", createPost);
 post_router.get("/posts", getPosts);
 post_router.get("/profileposts/:id", getProfilePosts);
 post_router.get("/post/:id", getPost);
